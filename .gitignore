@@ -1,0 +1,19 @@
+### Java ###
+target/
+.log
+
+### IntelliJ IDEA ###
+.idea/
+*.iml
+
+### VS Code ###
+.vscode/
+
+### Mac OS ###
+.DS_Store
+
+### SQL ###
+*.db
+
+### Excel ###
+~$*.xslx
