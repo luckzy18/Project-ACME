@@ -1,7 +1,10 @@
-storage: 
-SQL lite 
-DB built automatically 
+# List of Assumptions
+*****
+## Storage
 
+- SQL lite 
+- DB built automatically 
 
-teller has to id customer using the id the user brought
+## Interactions
+- Teller has to id customer using the id the user brought (No need to implement any verification steps code)
 
