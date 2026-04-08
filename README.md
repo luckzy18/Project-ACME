@@ -49,4 +49,4 @@ Made in:
 [![Java](https://img.shields.io/badge/Java-%23ED8B00.svg?logo=openjdk&logoColor=white)](https://www.java.com/en/)
 [![IntelliJ IDEA](https://img.shields.io/badge/IntelliJIDEA-000000.svg?logo=intellij-idea&logoColor=white)](https://www.jetbrains.com/idea/)
 
-Made with 💝 by Lucien, Kim, Harrison & Callum
+Made with 💝 by Lucian, Kim, Harrison & Callum
