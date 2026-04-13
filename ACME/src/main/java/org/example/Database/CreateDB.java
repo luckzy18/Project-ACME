@@ -18,12 +18,14 @@ public class CreateDB {
                     teller_ID          TEXT PRIMARY KEY,
                     teller_Name       TEXT NOT NULL,
                     teller_Password   TEXT NOT NULL,
+                    teller_role         TEXT NOT NULL
                 );
                 """;
         String createCustomers = """
                 CREATE TABLE IF NOT EXISTS Customer (
                     customer_ID          TEXT PRIMARY KEY,
                     customer_name       TEXT NOT NULL,
+                    customer_signup_date    TEXT NOT NULL,
                 );
                 """;
         String createAccount = """
@@ -34,24 +36,35 @@ public class CreateDB {
                     balance         TEXT NOT NULL,
                     account_expiry_date     TEXT NOT NULL,
                     account_start_date      TEXT NOT NULL,
-                    is_active TEXT NOT NULL
+                    is_active TEXT NOT NULL,
+                    FOREIGN KEY (customer_ID) REFERENCES CUSTOMER(customer_id)
                 );
                 """;
         String createPersonalAccount= """
                 CREATE TABLE IF NOT EXISTS PersonalACC (
                     account_Number TEXT NOT NULL,
                     photo_ID_Verified Boolean,
-                    
-                )""";
-
+                    FOREIGN KEY (account_number) REFERENCES Account(account_number)
+                );""";
+        String createISAAccount= """
+                CREATE TABLE IF NOT EXISTS PersonalACC (
+                    account_Number TEXT NOT NULL,
+                    photo_ID_Verified Boolean
+                );
+                """;
 
         try (Connection conn = connect();
              Statement stmt = conn.createStatement()) {
 
             stmt.execute(createCustomers);
+            System.out.println("Customers.");
             stmt.execute(createTeller);
+            System.out.println("tellers.");
             stmt.execute(createAccount);
+            System.out.println("account");
             stmt.execute(createPersonalAccount);
+            IO.println("personal account created");
+            stmt.execute(createISAAccount);
             System.out.println("Tables created successfully.");
 
         } catch (Exception e) {
