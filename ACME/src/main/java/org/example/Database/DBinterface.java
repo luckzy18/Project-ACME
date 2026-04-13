@@ -1,6 +1,7 @@
 package org.example.Database;
 
-import org.example.User.Teller;
+
+import org.example.model.User;
 
 import java.sql.*;
 
@@ -13,8 +14,9 @@ private static Connection connect() throws Exception {
 }
 
 
-    public Teller tellerTryLogin(String id, String password) {
+    public User tellerTryLogin(String id, String password) {
     String query= "SELECT * FROM TELLER WHERE ID=? and password=?";
+    User us=null;
     try (Connection conn = connect();
     PreparedStatement stmt =conn.prepareStatement(query)){
             stmt.setString(1,id);
@@ -24,19 +26,20 @@ private static Connection connect() throws Exception {
     if (rs.next()){
         String firstName=rs.getString("firstName");
         String lastName=rs.getString("lastname");
-        return new Teller(id, firstName, lastName);
+        //return new User(id, firstName, lastName);
     }else{
-        return new Teller();
+       // return new User();
     }
 
     } catch (Exception e) {
         throw new RuntimeException(e);
     }
+    return us;
 
 }
-    public Customer getCustomer(String customerID){
-    // get customer details based on custoemr id
+    public String getCustomer(String customerID){
+    // get customer details based on customer id the method needs work
     return "testValue";
     }
-    public Account[] getAccounts()
+//    public Account[] getAccounts()
 }
