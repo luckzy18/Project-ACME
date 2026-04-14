@@ -7,7 +7,7 @@ import org.testng.annotations.Test;
 public class InsertTest {
 
     @Test
-    void testInsertCustomer() {
+    void testGetCustomer() {
         // Insert the customer
 //        boolean insert=DBinterface.insertCustomer("Test", true, true);
 //        Assert.assertTrue(insert,"failed to insert user");
@@ -16,9 +16,13 @@ public class InsertTest {
 
         // Assert the values are stored correctly
        Assert.assertNotNull(customer, "Customer should not be null");
+       IO.println(customer.getName());
+       Assert.assertTrue(customer.getName().equals("Test"));
      //   Assert.assertEquals(customer.getName(), "Test", "Customer name should match");
        // Assert.assertTrue(customer.isActive(), "Customer active flag should be true");
      //   Assert.assertTrue(customer.isVerified(), "Customer verified flag should be true");
     }
+    @Test
+    void testInsertCustomer() {}
 
 }

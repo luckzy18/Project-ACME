@@ -40,12 +40,13 @@ private static Connection connect() throws Exception {
 
 }
 
-    public static boolean  insertCustomer (String name,boolean addressVerfied,boolean identityVerified){
+    public static String  insertCustomer (String name,boolean addressVerfied,boolean identityVerified){
     String insertCustomer="Insert into Customer(customer_ID,customer_name,address_verified,id_verified,customer_signup_date)" +
             " Values(?,?,?,?,?)";
+    String customerID="123";// make this unique and can be checked with a method tbc
     try (Connection conn = connect();
          PreparedStatement stmt =conn.prepareStatement(insertCustomer)){
-        stmt.setString(1,"2");
+        stmt.setString(1,customerID);
          stmt.setString(2,name);
          stmt.setBoolean(3,addressVerfied);
          stmt.setBoolean(4,identityVerified);
@@ -56,9 +57,9 @@ private static Connection connect() throws Exception {
 //
     }catch(Exception e){
         e.printStackTrace();
-        return false;
+        return null;
     }
-    return true;
+    return customerID;
     }
 
     public static Customer getCustomerbyID(String id){
@@ -90,7 +91,21 @@ private static Connection connect() throws Exception {
     public static boolean deleteCustomerbyID(String id){
         String checkAccounts = "SELECT COUNT(*) FROM Account WHERE customer_ID = ? AND account_status = 'open'";
         String deleteCustomer = "DELETE FROM Customer WHERE customer_ID = ?";
+        try(Connection conn = connect();
+        PreparedStatement stmt=conn.prepareStatement(checkAccounts);
+        PreparedStatement dstmt=conn.prepareStatement(deleteCustomer);){
+        stmt.setString(1,id);
+        ResultSet rs=stmt.executeQuery();
 
-    return true;
+        if(rs.next() && rs.getInt(1) == 0){
+            dstmt.setString(1,id);
+            int rowsAffected =dstmt.executeUpdate();
+            return rowsAffected > 0;
+        }else{
+            return false;
+        }
+        }catch (Exception e){
+            throw new RuntimeException(e);
+        }
     }
 }
