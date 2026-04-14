@@ -6,5 +6,6 @@
 - DB built automatically 
 
 ## Interactions
-- Teller has to id customer using the id the user brought (No need to implement any verification steps code)
+- No Telephony in branch only so no extra verification steps.
+- Teller has to id customer using the id the user brought (No need to implement any verification steps code).
 
