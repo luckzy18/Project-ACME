@@ -26,6 +26,8 @@ public class CreateDB {
                 CREATE TABLE IF NOT EXISTS Customer (
                     customer_ID          TEXT PRIMARY KEY,
                     customer_name       TEXT NOT NULL,
+                    address_verified    INTEGER NOT NULL DEFAULT 0,
+                    id_verified         INTEGER NOT NULL DEFAULT 0,
                     customer_signup_date    DATE NOT NULL
                 );
                 """;
@@ -65,6 +67,7 @@ public class CreateDB {
                 FOREIGN KEY (account_number) REFERENCES Account(account_number)
                  )
                """;
+
 
         try (Connection conn = connect();
              Statement stmt = conn.createStatement()) {

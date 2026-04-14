@@ -1,13 +1,13 @@
 package org.example.Database;
 
-
+import java.time.LocalDate;
 import org.example.model.User;
 
 import java.sql.*;
 
 public class DBinterface {
     private static final String URL = "jdbc:sqlite:acmebank.db";
-
+    private static LocalDate date=LocalDate.now();
 
 private static Connection connect() throws Exception {
     return DriverManager.getConnection(URL);
@@ -37,9 +37,22 @@ private static Connection connect() throws Exception {
     return us;
 
 }
-    public String getCustomer(String customerID){
-    // get customer details based on customer id the method needs work
-    return "testValue";
+
+    public boolean insertCustomer (String name,boolean addressVerfied,boolean identityVerified){
+    String insertCustomer=("Insert into Customer(customer_ID,customer_name,address_verified,id_verified,customer_signup_date)" +
+            "Values(?,?,?,?,?))");
+    try (Connection conn = connect();
+         PreparedStatement stmt =conn.prepareStatement(insertCustomer)){
+        stmt.setString(1,"GETID");
+         stmt.setString(2,name);
+         stmt.setBoolean(3,addressVerfied);
+         stmt.setBoolean(4,identityVerified);
+         stmt.setDate(5, Date.valueOf(date));
+
+//
+    }catch(Exception e){
+        e.printStackTrace();
     }
-//    public Account[] getAccounts()
+    return true;
+    }
 }
