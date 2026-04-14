@@ -52,6 +52,7 @@ private static Connection connect() throws Exception {
 //
     }catch(Exception e){
         e.printStackTrace();
+        return false;
     }
     return true;
     }
