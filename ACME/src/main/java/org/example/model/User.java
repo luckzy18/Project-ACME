@@ -1,5 +1,4 @@
-package org.example.model.user;
-
+package org.example.model;
 public class User {
     private final int tellerId;
     private final String name;
