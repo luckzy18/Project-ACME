@@ -3,6 +3,7 @@ package org.example.Database;
 import java.time.LocalDate;
 
 import org.example.model.Customer;
+import org.example.model.Role;
 import org.example.model.User;
 import org.example.utils.Generator;
 
@@ -17,14 +18,27 @@ private static Connection connect() throws Exception {
 }
 
     public String[] generateNewTeller(){
-    String id="1234";//can be checked with a
-    String password="temp"+ Generator.generateTemporaryPassword();// make a list of simple passwords and return them
-    String[] output= {id,password};
-    return output;
+    String query="INSERT INTO TELLER(teller_Password,teller_role) VALUES(??);";
+    String password="temp"+ Generator.generateTemporaryPassword();
+    try (Connection conn = connect();
+         PreparedStatement stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);){
+            stmt.setString(1,password);
+            stmt.setString(2,"TELLER");
+            stmt.executeUpdate();
+
+            ResultSet rs=stmt.getGeneratedKeys();
+            if(rs.next()){
+                String[] output= {rs.getString(1),password};
+                return output;
+            }
+            }catch(Exception e){
+            e.printStackTrace();
+        }
+    return null;
     }
 
-    public User tellerTryLogin(String id, String password) {
-    String query= "SELECT * FROM TELLER WHERE ID=? and password=?";
+    public static User tellerTryLogin(String id, String password) {
+    String query= "SELECT * FROM TELLER WHERE teller_ID=? and teller_password=?";
     User us=null;
     try (Connection conn = connect();
     PreparedStatement stmt =conn.prepareStatement(query)){
@@ -33,48 +47,50 @@ private static Connection connect() throws Exception {
 
     ResultSet rs=stmt.executeQuery();
     if (rs.next()){
-        String firstName=rs.getString("firstName");
-        String lastName=rs.getString("lastname");
-        //return new User(id, firstName, lastName);
+       String name=rs.getString("teller_Name");
+       String role=rs.getString("teller_role");
+       Role rl=Role.valueOf(role);
+       us=new User(Integer.parseInt(id),name,password,rl);
+       return us;
     }else{
-       // return new User();
+       return us;
     }
 
     } catch (Exception e) {
         throw new RuntimeException(e);
     }
-    return us;
+
 
 }
 
-    public static String  insertCustomer (String name,boolean addressVerfied,boolean identityVerified){
-    String insertCustomer="Insert into Customer(customer_ID,customer_name,address_verified,id_verified,customer_signup_date)" +
-            " Values(?,?,?,?,?)";
-    String customerID="123";// make this unique and can be checked with a method checkCustomerID
+    public static Integer  insertCustomer (String name,boolean addressVerfied,boolean identityVerified){
+    String insertCustomer="Insert into Customer(customer_name,address_verified,id_verified,customer_signup_date)" +
+            " Values(?,?,?,?)";
     try (Connection conn = connect();
-         PreparedStatement stmt =conn.prepareStatement(insertCustomer)){
-        stmt.setString(1,customerID);
-         stmt.setString(2,name);
-         stmt.setBoolean(3,addressVerfied);
-         stmt.setBoolean(4,identityVerified);
-         stmt.setString(5, LocalDate.now().toString());
+         PreparedStatement stmt = conn.prepareStatement(insertCustomer, Statement.RETURN_GENERATED_KEYS);){
+         stmt.setString(1,name);
+         stmt.setBoolean(2,addressVerfied);
+         stmt.setBoolean(3,identityVerified);
+         stmt.setString(4, LocalDate.now().toString());
 
          stmt.executeUpdate();
 
-//
+         ResultSet rs=stmt.getGeneratedKeys();
+         if(rs.next()){
+             return rs.getInt(1);
+         }
     }catch(Exception e){
         e.printStackTrace();
-        return null;
     }
-    return customerID;
+    return null;
     }
 
-    public static Customer getCustomerbyID(String id){
+    public static Customer getCustomerbyID(Integer id){
         String query= "SELECT * FROM Customer WHERE customer_ID=? ;";
         Customer us=null;
         try (Connection conn = connect();
              PreparedStatement stmt =conn.prepareStatement(query)){
-            stmt.setString(1,id);
+            stmt.setInt(1,id);
 
 
             ResultSet rs=stmt.executeQuery();
