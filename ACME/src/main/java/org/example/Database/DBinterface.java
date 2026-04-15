@@ -22,7 +22,6 @@ private static Connection connect() throws Exception {
     return output;
     }
 
-
     public User tellerTryLogin(String id, String password) {
     String query= "SELECT * FROM TELLER WHERE ID=? and password=?";
     User us=null;
