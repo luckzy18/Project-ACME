@@ -1,10 +1,6 @@
 package org.example.utils;
 
-import org.example.Database.DBinterface;
-
 import java.security.SecureRandom;
-import java.util.Random;
-
 
 
 public class Generator {
@@ -18,5 +14,10 @@ private static final String CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             id.append(CHARS.charAt(random.nextInt(CHARS.length())));
         }
         return id.toString();
+    }
+
+    public static String generateAccountNumber() {
+        int num = random.nextInt(100_000_000);
+        return String.format("%08d",num);
     }
 }
