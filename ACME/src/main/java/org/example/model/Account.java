@@ -35,6 +35,10 @@ public abstract class Account {
 
     //Methods
 
+    public void setAccountNumber(int accountNumber) {
+        this.accountNumber = accountNumber;
+    }
+
     //Deposit money into the account
     public void deposit(double amount) { }
 
