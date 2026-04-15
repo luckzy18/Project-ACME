@@ -15,6 +15,13 @@ private static Connection connect() throws Exception {
     return DriverManager.getConnection(URL);
 }
 
+    public String[] generateNewTeller(){
+    String id="1234";//can be checked with a
+    String password="password";// make a list of simple passwords and return them
+    String[] output= {id,password};
+    return output;
+    }
+
 
     public User tellerTryLogin(String id, String password) {
     String query= "SELECT * FROM TELLER WHERE ID=? and password=?";
@@ -43,7 +50,7 @@ private static Connection connect() throws Exception {
     public static String  insertCustomer (String name,boolean addressVerfied,boolean identityVerified){
     String insertCustomer="Insert into Customer(customer_ID,customer_name,address_verified,id_verified,customer_signup_date)" +
             " Values(?,?,?,?,?)";
-    String customerID="123";// make this unique and can be checked with a method tbc
+    String customerID="123";// make this unique and can be checked with a method checkCustomerID
     try (Connection conn = connect();
          PreparedStatement stmt =conn.prepareStatement(insertCustomer)){
         stmt.setString(1,customerID);
@@ -105,6 +112,29 @@ private static Connection connect() throws Exception {
             return false;
         }
         }catch (Exception e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    public boolean checkCustomerID(String id){
+        String query="SELECT COUNT(*) FROM Customer WHERE customer_ID=?;";
+        try (Connection conn = connect();
+             PreparedStatement stmt =conn.prepareStatement(query)){
+            stmt.setString(1,id);
+            int count=stmt.executeUpdate();
+            return count<1;
+        }catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+}
+    public boolean checkTellerID(String id) {
+        String query = "SELECT COUNT(*) FROM Teller WHERE teller_id=?;";
+        try (Connection conn = connect();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, id);
+            int count = stmt.executeUpdate();
+            return count < 1;
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
