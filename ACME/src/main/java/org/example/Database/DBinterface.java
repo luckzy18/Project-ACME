@@ -1,7 +1,10 @@
 package org.example.Database;
 
 import java.time.LocalDate;
+
+import org.example.model.Customer;
 import org.example.model.User;
+import org.example.utils.Generator;
 
 import java.sql.*;
 
@@ -15,7 +18,7 @@ private static Connection connect() throws Exception {
 
     public String[] generateNewTeller(){
     String id="1234";//can be checked with a
-    String password="temp"+Generator.generateTemporaryPassword();// make a list of simple passwords and return them
+    String password="temp"+ Generator.generateTemporaryPassword();// make a list of simple passwords and return them
     String[] output= {id,password};
     return output;
     }
