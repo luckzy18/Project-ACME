@@ -17,13 +17,13 @@ public class CreateDB {
                 CREATE TABLE IF NOT EXISTS Teller (
                     teller_ID          TEXT PRIMARY KEY,
                     teller_Name       TEXT NOT NULL,
-                    teller_Password   TEXT NOT NULL,
+                    teller_Password   TEXT NOT NULL
                 );
                 """;
         String createCustomers = """
                 CREATE TABLE IF NOT EXISTS Customer (
                     customer_ID          TEXT PRIMARY KEY,
-                    customer_name       TEXT NOT NULL,
+                    customer_name       TEXT NOT NULL
                 );
                 """;
         String createAccount = """
@@ -31,7 +31,7 @@ public class CreateDB {
                     account_Number      VARCHAR PRIMARY KEY,
                     customer_ID     TEXT NOT NULL,
                     sort_code       TEXT NOT NULL,
-                    balance         TEXT NOT NULL,
+                    balance         REAL NOT NULL,
                     account_expiry_date     TEXT NOT NULL,
                     account_start_date      TEXT NOT NULL,
                     is_active TEXT NOT NULL
@@ -40,8 +40,7 @@ public class CreateDB {
         String createPersonalAccount= """
                 CREATE TABLE IF NOT EXISTS PersonalACC (
                     account_Number TEXT NOT NULL,
-                    photo_ID_Verified Boolean,
-                    
+                    photo_ID_Verified Boolean
                 )""";
 
 

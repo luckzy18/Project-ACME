@@ -35,7 +35,7 @@ private static Connection connect() throws Exception {
 
 }
     public Customer getCustomer(String customerID){
-    // get customer details based on custoemr id
+    // get customer details based on customer id
     return "testValue";
     }
     public Account[] getAccounts()
