@@ -1,16 +1,13 @@
 package org.example.Database;
 
 import java.time.LocalDate;
-
-import org.example.model.Customer;
 import org.example.model.User;
-import org.example.utils.Generator;
 
 import java.sql.*;
 
 public class DBinterface {
     private static final String URL = "jdbc:sqlite:acmebank.db";
-
+    private static LocalDate date=LocalDate.now();
 
 private static Connection connect() throws Exception {
     return DriverManager.getConnection(URL);
@@ -138,10 +135,4 @@ private static Connection connect() throws Exception {
             throw new RuntimeException(e);
         }
     }
-//    public String fetchHighestCustomerID(){
-//    return "s";
-//    }
-//    public String fetchHighestCustomerID(){
-//        return "s";
-//    }
 }
