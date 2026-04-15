@@ -16,7 +16,7 @@ public class CreateDB {
     public static void initialise() {
         String createTeller = """
                 CREATE TABLE IF NOT EXISTS Teller (
-                    teller_ID          TEXT PRIMARY KEY,
+                    teller_ID          INTEGER PRIMARY KEY AUTOINCREMENT,
                     teller_Name       TEXT NOT NULL,
                     teller_Password   TEXT NOT NULL,
                     teller_role         TEXT NOT NULL
@@ -24,7 +24,7 @@ public class CreateDB {
                 """;
         String createCustomers = """
                 CREATE TABLE IF NOT EXISTS Customer (
-                    customer_ID          TEXT PRIMARY KEY,
+                    customer_ID          INTEGER PRIMARY KEY AUTOINCREMENT,
                     customer_name       TEXT NOT NULL,
                     address_verified    INTEGER NOT NULL DEFAULT 0,
                     id_verified         INTEGER NOT NULL DEFAULT 0,
