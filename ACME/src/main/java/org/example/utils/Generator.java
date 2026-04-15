@@ -1,10 +1,6 @@
 package org.example.utils;
 
-import org.example.Database.DBinterface;
-
 import java.security.SecureRandom;
-import java.util.Random;
-
 
 
 public class Generator {

@@ -1,4 +1,4 @@
-package org.example.model.session;
+package org.example.model;
 
 import java.sql.Time;
 import java.util.Date;
