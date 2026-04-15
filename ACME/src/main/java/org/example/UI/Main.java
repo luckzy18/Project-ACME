@@ -9,16 +9,16 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        // ************************
+
         // Sample Teller Data
-        // ************************
+
         ArrayList<Teller> tellers = new ArrayList<>();
         tellers.add(new Teller("T001", "pass123"));
         tellers.add(new Teller("T002", "bank456"));
 
-        // ************************
+
         // Sample Customer Data
-        // ************************
+
         ArrayList<Customer> customers = new ArrayList<>();
         customers.add(new Customer("C001", "Rianne"));
         customers.add(new Customer("C002", "Devon"));
@@ -26,9 +26,9 @@ public class Main {
         customers.add(new Customer("C004", "Nathan"));
 
 
-        // ************************
+
         // Teller Login Prompt
-        // ************************
+
         System.out.println("***********************************");
         System.out.println("      ACME BANK TELLER SYSTEM");
         System.out.println("***********************************");
@@ -40,9 +40,9 @@ public class Main {
 
         boolean loginSuccess = false;
 
-        // *********************
+
         // Check Teller Login
-        // *********************
+
         for (Teller teller : tellers) {
             if (teller.getTellerId().equalsIgnoreCase(enteredTellerId)
                     && teller.getPassword().equals(enteredPassword)) {
@@ -51,9 +51,9 @@ public class Main {
             }
         }
 
-        // **************************
+
         // Teller Login Result
-        // **************************
+
         if (!loginSuccess) {
             System.out.println();
             System.out.println("Login failed. Invalid Teller ID or Password, Please Try Again.");
@@ -65,18 +65,18 @@ public class Main {
         System.out.println("Login successful.");
         System.out.println("Welcome to the ACME Bank .");
 
-        // ****************************
+
         // Customer ID Input Prompt
-        // *****************************
+
         System.out.println();
         System.out.print("Please enter Customer ID: ");
         String enteredCustomerId = scanner.nextLine();
 
         Customer foundCustomer = null;
 
-        // ***********************
+
         // Check Customer ID
-        // ***********************
+
         for (Customer customer : customers) {
             if (customer.getCustomerId().equalsIgnoreCase(enteredCustomerId)) {
                 foundCustomer = customer;
@@ -84,9 +84,9 @@ public class Main {
             }
         }
 
-        // ****************************
+
         // Customer Found / Not Found
-        // *****************************
+
         if (foundCustomer != null) {
             System.out.println();
             System.out.println("************************************");
