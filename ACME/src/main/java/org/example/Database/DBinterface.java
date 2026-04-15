@@ -8,6 +8,8 @@ import org.example.model.User;
 import org.example.utils.Generator;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DBinterface {
     private static final String URL = "jdbc:sqlite:acmebank.db";
@@ -111,7 +113,7 @@ private static Connection connect() throws Exception {
 
 
     }
-    public static boolean deleteCustomerbyID(String id){
+    public static boolean deleteCustomerByID(String id){
         String checkAccounts = "SELECT COUNT(*) FROM Account WHERE customer_ID = ? AND account_status = 'open'";
         String deleteCustomer = "DELETE FROM Customer WHERE customer_ID = ?";
         try(Connection conn = connect();
@@ -130,6 +132,37 @@ private static Connection connect() throws Exception {
         }catch (Exception e){
             throw new RuntimeException(e);
         }
+    }
+    public String[] getAllTellers(){
+    String query="SELECT teller_ID,teller_name,teller_role FROM TELLER;";
+        try(Connection conn=connect();
+            PreparedStatement dstmt=conn.prepareStatement(query)){
+            ResultSet rs=dstmt.executeQuery();
+            List<String> tellers = new ArrayList<>();
+            while (rs.next()) {
+                int id = rs.getInt("teller_ID");
+                String name = rs.getString("teller_name");
+                String role = rs.getString("teller_role");
+
+                String tellerInfo = "ID: " + id + ", Name: " + name + ", Role: " + role;
+                tellers.add(tellerInfo);
+            }
+            return tellers.toArray(new String[0]);
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public static boolean deleteTellerbyID(Integer id){
+    String query="Delete from Teller where teller_id=?";
+    try(Connection conn=connect();
+        PreparedStatement dstmt=conn.prepareStatement(query)){
+        dstmt.setInt(1,id);
+        int rowsAffected=dstmt.executeUpdate();
+        return rowsAffected>0;
+    } catch (Exception e) {
+        throw new RuntimeException(e);
+    }
     }
 
     public boolean checkCustomerID(String id){

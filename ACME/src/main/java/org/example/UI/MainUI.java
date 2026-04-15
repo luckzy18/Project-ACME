@@ -5,6 +5,7 @@ import java.util.Scanner;
 
 import org.example.Database.DBinterface;
 import org.example.model.User;
+import org.example.model.Customer;
 
 import static org.example.model.Role.ADMIN;
 
@@ -117,8 +118,12 @@ public class MainUI {
           switch (choice){
               // for anyone working on this please check method signature in dbinterface
                 // the return values should be displayed to the user for a reason if you think some return values need altering either do it or ask for help
+             // at the moment I had no time to test all methods if any do not work either fix or let me know
               case 1:
+                  Customer cust=getCustomer();
+                //  enterCustomerMenu(cust);
                   IO.print("Searching for customer");
+
                   break;
                   // getCustomerbyID information retrieved is only about the user account nothing about banck acocunts
               case 2:
@@ -145,11 +150,36 @@ public class MainUI {
                   break;
               case 7:
                   IO.print("get all tellers");
-                  //this will fetch all tellers to allow admin to have a look and find them.
+                  //getAllTellers in a readable format will fetch all tellers. if you want to change the way this is displayed go into dbinterface
               case 8:
                   IO.print("delete teller");
-                  //this will delete a teller
+                  //deleteTellerbyID method deletes the teller if the id is inserted except for admin
           }
+    }
+    Customer getCustomer(){
+        Scanner sc=new Scanner(System.in);
+
+        IO.println("Please enter customer ID: ");
+        String input=sc.nextLine();
+        while(!isInt(input)){
+            IO.println("Invalid input");
+            IO.println("Please enter a customer ID: ");
+        }
+        int inp=Integer.parseInt(input);
+        Customer cust=DBinterface.getCustomerbyID(inp);
+        sc.close();
+
+        return cust;
+    }
+    private static boolean isInt(String input) {
+        try {
+            Integer.parseInt(input);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+}
 
 
         // Check Teller Login
@@ -209,5 +239,3 @@ public class MainUI {
 //        }
 //
 //        scanner.close();
-    }
-}
