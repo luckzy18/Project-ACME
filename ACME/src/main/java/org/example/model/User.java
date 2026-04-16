@@ -1,6 +1,6 @@
 package org.example.model;
 
-public abstract class User {
+public class User {
     private final int tellerId;
     private final String name;
     private String password;
@@ -19,6 +19,9 @@ public abstract class User {
     }
     public Role getRole() {
         return role;
+    }
+    public boolean isAdmin() {
+        return role == org.example.model.Role.ADMIN;
     }
     public void setPassword(String password) {
         this.password = password;
