@@ -114,6 +114,7 @@ public class MainUI {
 
       void main() {
         teller=loginTeller();
+        //tellerFirstLoginUpdate has to be checked if name field is empty and be added to prompt teller to change password and add name
           int choice=getMenuChoice(teller);
           switch (choice){
               // for anyone working on this please check method signature in dbinterface
@@ -143,7 +144,7 @@ public class MainUI {
                   //shut down the system with something like sys.exit(0) and a clsoing message
                   break;
 
-             // Could be worth to move the admin actions into a different class cleaning tasks
+             /// Could be worth to move the admin actions into a different class cleaning tasks
               case 6:
                   IO.print("generate the login details for a new user");
                   //generateNewTeller

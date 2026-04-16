@@ -38,6 +38,20 @@ private static Connection connect() throws Exception {
         }
     return null;
     }
+    public boolean tellerFirstLoginUpdate(String name, String password,int id){
+    String query="UPDATE TELLER set TELLER_NAME= ?,TELLER_PASSWORD = ? WHERE TELLER_ID=?;";
+    try(Connection conn=connect();
+    PreparedStatement stmt=conn.prepareStatement(query)){
+        stmt.setString(1,name);
+        stmt.setString(2,password);
+        stmt.setInt(3,id);
+        int rowsAffected=stmt.executeUpdate();
+        return rowsAffected>0;
+    } catch (Exception e) {
+        throw new RuntimeException(e);
+    }
+
+    }
 
     public static User tellerTryLogin(String id, String password) {
     String query= "SELECT * FROM TELLER WHERE teller_ID=? and teller_password=?";
@@ -153,17 +167,23 @@ private static Connection connect() throws Exception {
             throw new RuntimeException(e);
         }
     }
-    public static boolean deleteTellerbyID(Integer id){
-    String query="Delete from Teller where teller_id=?";
+    public static boolean deleteTellerbyID(Integer id){// feel free to make 2 different statements for failed deletion
+    String fetch="SELECT TELLER_ROLE FROM TELLER WHERE TELLER_ID=?;";
+    String deleteQuery="Delete from Teller where teller_id=?";
     try(Connection conn=connect();
-        PreparedStatement dstmt=conn.prepareStatement(query)){
-        dstmt.setInt(1,id);
-        int rowsAffected=dstmt.executeUpdate();
-        return rowsAffected>0;
+        PreparedStatement stmt=conn.prepareStatement(fetch);
+        PreparedStatement dstmt=conn.prepareStatement(deleteQuery)){
+            dstmt.setInt(1,id);
+            int rowsAffected=dstmt.executeUpdate();
+            return rowsAffected>0;// returns the rows affected and been used to turn into true
     } catch (Exception e) {
         throw new RuntimeException(e);
     }
     }
+    /// TIME TO WORK ON ACCOUNT CREATION, GENERATIONS WITHDRAW AND DEPOST
+    /// GETTER FOR ALL ACCOUNTS A CUSTOMER HAS AND STORED LOCALLY ONCE FETCHED
+    /// THE ACCOUNTS SHOULD BE GENERATED FIRST WITHIN 3 METHODS ONE FOR EACH ACCOUNT TYPE AN OVERLOADED METHOD WOULD WORK NICELY
+    ///  WITHDRAW AND DEPOSI CAN COME AFTER ACCOUNT CREATION
 
     public boolean checkCustomerID(String id){
         String query="SELECT COUNT(*) FROM Customer WHERE customer_ID=?;";
