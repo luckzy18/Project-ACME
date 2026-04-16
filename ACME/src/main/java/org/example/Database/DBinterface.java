@@ -17,7 +17,7 @@ private static Connection connect() throws Exception {
     return DriverManager.getConnection(URL);
 }
 
-    public String[] generateNewTeller(){
+    public static String[] generateNewTeller(){
     String query="INSERT INTO TELLER(teller_Password,teller_role) VALUES(??);";
     String password="temp"+ Generator.generateTemporaryPassword();
     try (Connection conn = connect();

@@ -8,7 +8,20 @@ import org.example.model.User;
 import org.example.model.Customer;
 
 
+
 public class MainUI {
+
+
+    private static String logo= """
+            ***********************************
+                 ACME BANK TELLER SYSTEM
+            ***********************************
+            """;
+    private User teller;
+
+    public MainUI(){
+        this.teller=loginTeller();
+    }
 
     public User getTeller() {
         return teller;
@@ -18,19 +31,26 @@ public class MainUI {
         this.teller = teller;
     }
 
-    private User teller;
+    public void start(){
+        int input=getMenuChoice(this.teller);
+        while(input !=5){
+            input=getMenuChoice(this.teller);
+            performAction();
+        }
+        IO.println("Shutting down");
+    }
+
+
+
 
 
     User loginTeller(){//logs in teller
         Scanner scanner = new Scanner(System.in);
         boolean loginSuccess = false;
+
         // Teller Login Prompt
 
-
-
-        System.out.println("***********************************");
-        System.out.println("      ACME BANK TELLER SYSTEM");
-        System.out.println("***********************************");
+        IO.println(logo);
         System.out.print("Please enter Teller ID: ");
         String enteredTellerId = scanner.nextLine();
         System.out.print("Please enter Password: ");
@@ -57,6 +77,8 @@ public class MainUI {
         }
         return user;
     }
+
+
     int getMenuChoice(User user){
             String greet="\n=== 🏦 ACME Banking System ===\nWelcome, " + user.getName();
             String customerActions= """
@@ -68,10 +90,10 @@ public class MainUI {
                                 5. Exit
                     """;
             String adminActions= """
-                    "--- Admin Actions ---");
-                                    IO.println("6. Generate one-time login code");
-                                    IO.println("7. View tellers");
-                                    IO.println("8. Remove teller");
+                                    --- Admin Actions ---
+                                    6. Generate one-time login code
+                                    7. View tellers
+                                    8. Remove teller
                     """;
             IO.println(greet);
             IO.println(customerActions);
@@ -101,7 +123,8 @@ public class MainUI {
                         System.out.println("You chose: " + choice);
                         invalidOption=false;
                     }else {
-                        System.out.println("Please enter a valid number:.");
+                        System.out.println(choice +" is not a valid input");
+                        System.out.println("Please enter a valid input:.");
                     }
 
                 } catch (NumberFormatException e) {
@@ -112,8 +135,7 @@ public class MainUI {
 
     }
 
-      void main() {
-        teller=loginTeller();
+       void performAction() {
         //tellerFirstLoginUpdate has to be checked if name field is empty and be added to prompt teller to change password and add name
           int choice=getMenuChoice(teller);
           switch (choice){
@@ -121,9 +143,15 @@ public class MainUI {
                 // the return values should be displayed to the user for a reason if you think some return values need altering either do it or ask for help
              // at the moment I had no time to test all methods if any do not work either fix or let me know
               case 1:
-                  Customer cust=getCustomer();
+                  int customerId=CustomerUI.promptCustomerID();//prompt to get id details
+                  if(customerId>0){
+                      Customer cust= DBinterface.getCustomerbyID(customerId);
+                  }
+                  CustomerUI.promptActions();
+
+
                 //  enterCustomerMenu(cust);
-                  IO.print("Searching for customer");
+
 
                   break;
                   // getCustomerbyID information retrieved is only about the user account nothing about bank accounts
@@ -146,8 +174,9 @@ public class MainUI {
 
              // Could be worth to move the admin actions into a different class cleaning tasks
               case 6:
-                  IO.print("generate the login details for a new user");
-                  //generateNewTeller
+                  IO.print("Generating new login details:");
+
+                  String [] loginDetails=DBinterface.generateNewTeller();
                   break;
               case 7:
                   IO.print("get all tellers");
