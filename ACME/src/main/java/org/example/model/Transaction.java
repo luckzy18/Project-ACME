@@ -1,4 +1,4 @@
-package.org.example.model;
+package org.example.model;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -8,13 +8,12 @@ public class Transaction {
     public enum TransactionType {
         DEPOSIT,
         WITHDRAW,
-        TRANSFER_IN,
-        TRANSFER_OUT
+        TRANSFER//Transfer is no one action
     }
 
     public enum TransactionStatus {
         COMPLETE,
-        FAILED,
+        FAILED
     }
 
     //Fields
@@ -22,16 +21,16 @@ public class Transaction {
     private final String transactionID;
     private final TransactionType type;
     private TransactionStatus status;
-    private final int accountNumber;
+    private String accountNumber;
     private final double amount;
     private final double balanceBefore;
     private double balanceAfter;
     private final LocalDateTime timestamp;
     private String updates;
-    private Integer linkedAccountNumber; //For transferring between two accounts.
+    private String linkedAccountNumber; //For transferring between two accounts.
 
     //Constructor
-    public Transaction(String transactionID, TransactionType type, int accountNumber, double amount, double balanceBefore, LocalDateTime timestamp) {
+    public Transaction(TransactionType type, String accountNumber, double amount, double balanceBefore) {
         this.transactionID = UUID.randomUUID().toString();
         this.type = type;
         this.accountNumber = accountNumber;
@@ -42,7 +41,7 @@ public class Transaction {
 
     //Core method
     public boolean performTransaction(Account account) {
-        if (account.getAccountNumber() != this.accountNumber) {
+        if (!account.getAccountNumber().equals(this.accountNumber)) {
             this.status = TransactionStatus.FAILED;
             this.updates = "Account number doesn't match.";
             return false;
@@ -50,12 +49,10 @@ public class Transaction {
         try {
             switch (type) {
                 case DEPOSIT:
-                case TRANSFER_IN://Both cases share logic.
                     account.deposit(amount);
                     break;
 
                 case WITHDRAW:
-                case TRANSFER_OUT:
                     account.withdraw(amount);
                     break;
 
@@ -72,7 +69,33 @@ public class Transaction {
 
         } catch (Exception e) {
             this.status = TransactionStatus.FAILED;
-            this.updates = "Exception: " + e.getMessage();
+            this.updates = "Error! Transaction failed.";
+            e.printStackTrace();//Changed to be consistent for now, will circle back to remove later.
+            return false;
+        }
+    }
+
+    //Transfer method
+    public boolean performTransfer(Account senderAccount, Account recipientAccount) {
+        if (senderAccount == null || recipientAccount == null) {//I don't particulary like the sender/recipient names so I'm open to suggestions.
+            this.status = TransactionStatus.FAILED;
+            this.updates = "Transfer invalid. Check accounts are correct.";
+            return false;
+        }
+        try {
+            senderAccount.withdraw(amount);
+            recipientAccount.deposit(amount);
+
+            this.balanceAfter = senderAccount.getBalance();
+            this.linkedAccountNumber = recipientAccount.getAccountNumber();
+            this.status = TransactionStatus.COMPLETE;
+            this.updates = "Transfer successful.";
+            return true;
+
+        } catch (Exception e) {
+            this.status = TransactionStatus.FAILED;
+            this.updates = "Error! Transfer failed.";
+            e.printStackTrace();
             return false;
         }
     }
@@ -99,7 +122,7 @@ public class Transaction {
         return amount;
     }
 
-    public int getAccountNumber() {
+    public String getAccountNumber() {
         return accountNumber;
     }
 
@@ -119,7 +142,7 @@ public class Transaction {
         return updates;
     }
 
-    public Integer getLinkedAccountNumber() {
+    public String getLinkedAccountNumber() {
         return linkedAccountNumber;
     }
 
@@ -129,7 +152,7 @@ public class Transaction {
         this.updates = updates;
     }
 
-    public void setLinkedAccountNumber(Integer linkedAccountNumber) {
+    public void setLinkedAccountNumber(String linkedAccountNumber) {
         this.linkedAccountNumber = linkedAccountNumber;
     }
 
@@ -137,7 +160,7 @@ public class Transaction {
     @Override
     public String toString() {
         return String.format(
-                "Transaction{id='%s', account=%d, type=%s, amount=£%.2f, before=£%.2f, after=£%.2f, status=%s, time=%s}",
+                "Transaction{id='%s', account=%s, type=%s, amount=£%.2f, before=£%.2f, after=£%.2f, status=%s, time=%s}",
                 transactionID, accountNumber, type, amount, balanceBefore, balanceAfter, status, timestamp
         );
     }

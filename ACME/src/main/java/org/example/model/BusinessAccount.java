@@ -10,7 +10,7 @@ public class BusinessAccount extends Account {
     private boolean internationalTrading;//I'll also change this later
 
 
-    public BusinessAccount(int accountNumber, int customerID, String sortCode, double balance) {
+    public BusinessAccount(String accountNumber, int customerID, String sortCode, double balance) {
         super(accountNumber, customerID, sortCode, balance);
         this.businessType = businessType;
         this.overdraftAmount = 0.0; //Subject to change
