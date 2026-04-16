@@ -7,7 +7,6 @@ import org.example.Database.DBinterface;
 import org.example.model.User;
 import org.example.model.Customer;
 
-import static org.example.model.Role.ADMIN;
 
 public class MainUI {
 
@@ -38,8 +37,9 @@ public class MainUI {
         String enteredPassword = scanner.nextLine();
         User user = null;
         int count=0;
-        while(count <3 && loginSuccess ==false){
-             user=DBinterface.tellerTryLogin(enteredTellerId,enteredPassword);;
+        while(count <3 && !loginSuccess){
+            count++;
+             user=DBinterface.tellerTryLogin(enteredTellerId,enteredPassword);
             if(user != null){
                 loginSuccess = true;
                 break;
@@ -126,7 +126,7 @@ public class MainUI {
                   IO.print("Searching for customer");
 
                   break;
-                  // getCustomerbyID information retrieved is only about the user account nothing about banck acocunts
+                  // getCustomerbyID information retrieved is only about the user account nothing about bank accounts
               case 2:
                   IO.print("inserting Customer ");
                 //  insertCustomer gets an id back which is required for users to log in.
@@ -141,10 +141,10 @@ public class MainUI {
                   break;
               case 5:
                   IO.print("Exit");
-                  //shut down the system with something like sys.exit(0) and a clsoing message
+                  //shut down the system with something like sys.exit(0) and a closing message
                   break;
 
-             /// Could be worth to move the admin actions into a different class cleaning tasks
+             // Could be worth to move the admin actions into a different class cleaning tasks
               case 6:
                   IO.print("generate the login details for a new user");
                   //generateNewTeller

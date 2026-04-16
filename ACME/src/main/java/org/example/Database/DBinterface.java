@@ -2,9 +2,7 @@ package org.example.Database;
 
 import java.time.LocalDate;
 
-import org.example.model.Customer;
-import org.example.model.Role;
-import org.example.model.User;
+import org.example.model.*;
 import org.example.utils.Generator;
 
 import java.sql.*;
@@ -167,7 +165,7 @@ private static Connection connect() throws Exception {
             throw new RuntimeException(e);
         }
     }
-    public static boolean deleteTellerbyID(Integer id){// feel free to make 2 different statements for failed deletion
+    public static boolean deleteTellerByID(Integer id){// feel free to make 2 different statements for failed deletion
     String fetch="SELECT TELLER_ROLE FROM TELLER WHERE TELLER_ID=?;";
     String deleteQuery="Delete from Teller where teller_id=?";
     try(Connection conn=connect();
@@ -180,6 +178,15 @@ private static Connection connect() throws Exception {
         throw new RuntimeException(e);
     }
     }
+//    public Account createBankAccount(User user){
+//    return new BusinessAccount();
+//    }
+//    public Account createBankAccount(User user){
+//    return new ISAAccount();
+//    }
+//    public Account createBankAccount(User user){
+//    return new PersonalAccount();
+//    }
     /// TIME TO WORK ON ACCOUNT CREATION, GENERATIONS WITHDRAW AND DEPOST
     /// GETTER FOR ALL ACCOUNTS A CUSTOMER HAS AND STORED LOCALLY ONCE FETCHED
     /// THE ACCOUNTS SHOULD BE GENERATED FIRST WITHIN 3 METHODS ONE FOR EACH ACCOUNT TYPE AN OVERLOADED METHOD WOULD WORK NICELY
