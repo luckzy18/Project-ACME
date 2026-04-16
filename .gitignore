@@ -16,4 +16,5 @@ target/
 *.db
 
 ### Excel ###
-~$*.xslx
+~$*.xslx.DS_Store
+**/.DS_Store

@@ -12,7 +12,7 @@ public class InsertTest {
 //        boolean insert=DBinterface.insertCustomer("Test", true, true);
 //        Assert.assertTrue(insert,"failed to insert user");
         // Retrieve the customer from the DB
-       Customer customer = DBinterface.getCustomerbyID("1");
+       Customer customer = DBinterface.getCustomerbyID(1);
 
         // Assert the values are stored correctly
        Assert.assertNotNull(customer, "Customer should not be null");

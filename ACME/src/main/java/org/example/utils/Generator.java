@@ -15,4 +15,9 @@ private static final String CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         }
         return id.toString();
     }
+
+    public static String generateAccountNumber() {
+        int num = random.nextInt(100_000_000);
+        return String.format("%08d",num);
+    }
 }

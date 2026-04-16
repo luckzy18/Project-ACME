@@ -20,6 +20,9 @@ public class User {
     public Role getRole() {
         return role;
     }
+    public boolean isAdmin() {
+        return role == org.example.model.Role.ADMIN;
+    }
     public void setPassword(String password) {
         this.password = password;
     }

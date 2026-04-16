@@ -17,7 +17,7 @@ public class CreateDB {
         String createTeller = """
                 CREATE TABLE IF NOT EXISTS Teller (
                     teller_ID          INTEGER PRIMARY KEY AUTOINCREMENT,
-                    teller_Name       TEXT NOT NULL,
+                    teller_Name       TEXT,
                     teller_Password   TEXT NOT NULL,
                     teller_role         TEXT NOT NULL
                 );
@@ -92,14 +92,14 @@ public class CreateDB {
         }
     }
     private  static void initialiseMainTeller(){
-        String insertMainTeller="INSERT INTO Teller(teller_id,teller_name,teller_Password,teller_role)" +
-                "VALUES(?,?,?,?)";
+        String insertMainTeller="INSERT INTO Teller(teller_name,teller_Password,teller_role)" +
+                "VALUES(?,?,?)";
         try (Connection conn = connect();
              PreparedStatement stmt = conn.prepareStatement(insertMainTeller)){
-             stmt.setString(1,"TO01");
-             stmt.setString(2,"ADMIN");
-            stmt.setString(3,"1234");
-            stmt.setString(4,"ADMIN");
+
+             stmt.setString(1,"ADMIN");
+            stmt.setString(2,"1234");
+            stmt.setString(3,"ADMIN");
             stmt.executeUpdate();
             IO.println("Main teller added TO01 Admin");
         }catch(Exception e){
