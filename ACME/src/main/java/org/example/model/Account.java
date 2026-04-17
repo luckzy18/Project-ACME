@@ -1,7 +1,7 @@
 package org.example.model;
 public abstract class Account {
     //Fields
-    private int accountNumber;
+    private String accountNumber;
     private int customerID;
     private String sortCode;
     private double balance;
@@ -9,7 +9,7 @@ public abstract class Account {
     //private String expiryDate;
 
     //Constructor
-    public Account(int accountNumber, int customerID, String sortCode, double balance) {
+    public Account(String accountNumber, int customerID, String sortCode, double balance) {
         this.accountNumber = accountNumber;
         this.customerID = customerID;
         this.sortCode = sortCode;
@@ -17,7 +17,7 @@ public abstract class Account {
     }
 
     //Getters
-    public int getAccountNumber() {
+    public String getAccountNumber() {
         return accountNumber;
     }
 
@@ -35,7 +35,7 @@ public abstract class Account {
 
     //Methods
 
-    public void setAccountNumber(int accountNumber) {
+    public void setAccountNumber(String accountNumber) {
         this.accountNumber = accountNumber;
     }
 

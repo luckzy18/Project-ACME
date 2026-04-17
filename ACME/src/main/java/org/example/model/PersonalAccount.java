@@ -5,7 +5,7 @@ public class PersonalAccount extends Account {
     private String standingOrders; //Both strings until I confirm how we want to handle this.
 
     //Constructor matching super
-    public PersonalAccount(int accountNumber, int customerID, String sortCode, double balance) {
+    public PersonalAccount(String accountNumber, int customerID, String sortCode, double balance) {
         super(accountNumber, customerID, sortCode, balance);
     }
 
