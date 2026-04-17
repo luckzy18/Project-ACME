@@ -157,6 +157,7 @@ public class Transaction {
     }
 
     //Only necessary for testing if we want to print out transactions.
+    //Use for logging
     @Override
     public String toString() {
         return String.format(

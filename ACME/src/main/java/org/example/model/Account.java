@@ -34,14 +34,31 @@ public abstract class Account {
     }
 
     //Methods
-
     public void setAccountNumber(String accountNumber) {
         this.accountNumber = accountNumber;
     }
 
-    //Deposit money into the account
-    public void deposit(double amount) { }
+    protected void setBalance(double balance) { this.balance = balance; }//Allows subclass access.
 
-    // Withdraw money from the account
-    public void withdraw(double amount) { }
+    //Deposit money into the account
+    public void deposit(double amount) {
+        if (amount < 0) {
+            IO.println("Invalid amount. Deposit amount must be greater than zero.");
+            return;
+        }
+        setBalance(getBalance() + amount);
+    }
+
+    //Withdraw money from the account
+    public void withdraw(double amount) {
+        if (amount <= 0) {
+            IO.println("Invalid amount. Withdraw amount must be greater than zero.");
+            return;
+        }
+        if (amount > getBalance()) {
+            IO.println("Insufficient funds for withdrawal.");
+            return;
+        }
+        setBalance(getBalance() - amount);
+    }
 }

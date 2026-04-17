@@ -46,5 +46,21 @@ public class BusinessAccount extends Account {
     }
 
     //Methods
+    @Override
+    //Behaves differently because of the overdraft
+    public void withdraw(double amount) {
+        if (amount <= 0) {
+            IO.println("Invalid amount. Withdraw amount must be greater than zero.");
+            return;
+        }
+        //variable = (condition) ? expressionIfTrue : expressionIfFalse;
+        //Limit = (hasOverdraft) ? Balance + Overdraft : Balance
+        double limit = overdraft ? getBalance() + overdraftAmount : getBalance();
+        if (amount > limit) {
+            System.out.println("Error: Insufficient funds.");
+            return;
+        }
+        setBalance(getBalance() - amount);
+    }
 
 }
