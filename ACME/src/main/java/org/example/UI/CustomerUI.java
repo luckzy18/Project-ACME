@@ -54,7 +54,7 @@ public class CustomerUI {
             case 1://create personal
                 IO.println("creating acc.");
                 acc=AccountTypePolicy.PERSONAL;
-                DBinterface.createPersonalAccount(this.teller,customer, AccountTypePolicy.PERSONAL,-1);//
+                DBinterface.createPersonalAccount(this.teller,customer,acc,10);//
             case 2:// create isa
             case 3://create business
 

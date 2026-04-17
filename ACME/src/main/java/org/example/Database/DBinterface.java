@@ -192,7 +192,9 @@ private static Connection connect() throws Exception {
 //    return new BusinessAccount();
 //    }
     public static Account createPersonalAccount(User teller,Customer cu,AccountTypePolicy acc,double balance){
+    IO.println("creating acc");
     String accountNumber=getNewAccountNumber();
+    IO.println("acc_number is: "+accountNumber);
     insertBankAccount(acc,accountNumber,cu.getId(),balance);
     insertPersonalACC(accountNumber,cu.isIdVerified());
     return new PersonalAccount(accountNumber,cu.getId(),acc.getSortCode(),balance);
@@ -222,12 +224,14 @@ private static Connection connect() throws Exception {
         String accountNumber;
        do{
             accountNumber=Generator.generateAccountNumber();
-        }while(isACCunique(accountNumber));
+
+        }while(!isACCunique(accountNumber));
         return accountNumber;
     }
 
     private static boolean insertBankAccount(AccountTypePolicy acc, String account_Number, int customerId, double balance) {
-        String queryACC = """
+    IO.println("account inserted");
+    String queryACC = """
             INSERT INTO Account (account_Number, customer_ID, sort_code, balance, is_active, account_type)
             VALUES (?, ?, ?, ?, ?, ?);
             """;
