@@ -1,7 +1,5 @@
 package org.example.model;
 
-import org.example.model.Account.Account;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
 

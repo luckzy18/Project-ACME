@@ -6,7 +6,7 @@ public class ISAAccount extends Account {
     private double annualAverageBalance;
 
     //Constructor matching super
-    public ISAAccount(int accountNumber, int customerID, String sortCode, double balance) {
+    public ISAAccount(String accountNumber, int customerID, String sortCode, double balance) {
         super(accountNumber, customerID, sortCode, balance);
         this.annualInterestRate = 0.0275; //Will be changed when I better learn how ISA's work.
         this.annualAverageBalance = balance;
