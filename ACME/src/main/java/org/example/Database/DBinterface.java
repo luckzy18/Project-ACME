@@ -108,22 +108,26 @@ private static Connection connect() throws Exception {
     public static Customer getCustomerbyID(Integer id){
         String query= "SELECT * FROM Customer WHERE customer_ID=? ;";
         Customer us=null;
+
         try (Connection conn = connect();
              PreparedStatement stmt =conn.prepareStatement(query)){
             stmt.setInt(1,id);
 
-
             ResultSet rs=stmt.executeQuery();
+
             if (rs.next()){
                 String name=rs.getString("customer_name");
                 boolean idVerified=rs.getBoolean("id_verified");
                 boolean addressVerified=rs.getBoolean("address_verified");
                 String date=rs.getString("customer_signup_date");
+                IO.println("customer found: "+name);
                 us=new Customer(name,id,date,addressVerified,idVerified);
                 return us;
-            }else{
-               return us;
+            }else {
+                IO.println("No customer found with ID: " + id);
             }
+            return us;
+
 
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -247,13 +251,17 @@ private static Connection connect() throws Exception {
         }
     }
 
-    public boolean isACCunique(String acountNumber){
+    public static boolean isACCunique(String acountNumber){
         String query="SELECT COUNT(*) FROM account WHERE account_number=?;";
         try (Connection conn = connect();
              PreparedStatement stmt =conn.prepareStatement(query)){
             stmt.setString(1,acountNumber);
-            int count=stmt.executeUpdate();
-            return count<1;
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                int count = rs.getInt(1);
+                return count == 0; // true if no account with that number exists
+            }
+            return false;
         }catch (Exception e) {
             throw new RuntimeException(e);
         }

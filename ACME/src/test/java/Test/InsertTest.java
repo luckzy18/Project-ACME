@@ -48,6 +48,13 @@ public class InsertTest {
     }
 
     @Test
+    void testGetCustomerById(){
+        Customer cust=DBinterface.getCustomerbyID(1);
+
+        Assert.assertTrue(cust!=null);
+    }
+
+    @Test
     void testCalculateMonthlyInterest_WhenZeroBalance() {
         Overdraft overdraft = new Overdraft();
         overdraft.setOverdraftBalance(0);

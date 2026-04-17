@@ -20,9 +20,17 @@ public class MainUI {
     private User teller;
     private CustomerUI cUI;
 
+    public CustomerUI getcUI() {
+        return cUI;
+    }
+
+    public void setcUI(CustomerUI cUI) {
+        this.cUI = cUI;
+    }
+
     public MainUI(){
         this.teller=loginTeller();
-        cUI=new CustomerUI();
+        this.cUI=new CustomerUI();
     }
 
     public User getTeller() {
@@ -34,11 +42,11 @@ public class MainUI {
     }
 
     public void start(){
-        int input=getMenuChoice(this.teller);
-        while(input !=5){
+        int input=-1;
+        do{
             input=getMenuChoice(this.teller);
-            performAction();
-        }
+            performAction(input);
+        }while(input!=5);
         IO.println("Shutting down");
     }
 
@@ -135,24 +143,16 @@ public class MainUI {
 
     }
 
-       void performAction() {
-        //tellerFirstLoginUpdate has to be checked if name field is empty and be added to prompt teller to change password and add name
-          int choice=getMenuChoice(teller);
+       void performAction(int choice) {
           switch (choice){
               // for anyone working on this please check method signature in dbinterface
                 // the return values should be displayed to the user for a reason if you think some return values need altering either do it or ask for help
              // at the moment I had no time to test all methods if any do not work either fix or let me know
               case 1:
-                  int customerId=CustomerUI.promptCustomerID();//prompt to get id details
-                  Customer cust= DBinterface.getCustomerbyID(customerId);
-                  cUI.setCustomer(cust);
                   cUI.start();
 
-                //  enterCustomerMenu(cust);
-                  IO.print("Searching for customer");
-
                   break;
-                  // getCustomerbyID information retrieved is only about the user account nothing about bank accounts
+                  // getCustomerbyID information retrieved is only about the customer account nothing about bank accounts
               case 2:
                   IO.print("inserting Customer ");
                 //  insertCustomer gets an id back which is required for users to log in.
@@ -185,29 +185,6 @@ public class MainUI {
                   IO.print("delete teller");
                   //deleteTellerbyID method deletes the teller if the id is inserted except for admin
           }
-    }
-    Customer getCustomer(){
-        Scanner sc=new Scanner(System.in);
-
-        IO.println("Please enter customer ID: ");
-        String input=sc.nextLine();
-        while(!isInt(input)){
-            IO.println("Invalid input");
-            IO.println("Please enter a customer ID: ");
-        }
-        int inp=Integer.parseInt(input);
-        Customer cust=DBinterface.getCustomerbyID(inp);
-        sc.close();
-
-        return cust;
-    }
-    private static boolean isInt(String input) {
-        try {
-            Integer.parseInt(input);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
     }
 }
 
