@@ -1,6 +1,7 @@
 package org.example.UI;
 
 import org.example.Database.DBinterface;
+import org.example.model.Account.Account;
 import org.example.model.Account.AccountTypePolicy;
 import org.example.model.people.Customer;
 import org.example.model.people.User;
@@ -52,9 +53,10 @@ public class CustomerUI {
         // a method to request the common input for all accounts
         switch (userInput){
             case 1://create personal
-                IO.println("creating acc.");
+                IO.println("creating personal Account.");
                 acc=AccountTypePolicy.PERSONAL;
-                DBinterface.createPersonalAccount(this.teller,customer,acc,10);//
+                Account a=DBinterface.createPersonalAccount(this.teller,customer,acc,10);//
+                IO.println(a);
             case 2:// create isa
             case 3://create business
 
@@ -80,6 +82,9 @@ public  int promptCustomerID(){
 
 private int  promptActions(Customer cu) {
     IO.println("create accounts [1-3] personal,isa,bussiness,check accounts,deposit withdraw,");
+    Scanner sc=new Scanner(System.in);
+    IO.println("1 for personal acc, -1 exit");
+    int input=sc.nextInt();
     //this method will make the teller select from a number of actions
     //create account
     //delete account
@@ -87,7 +92,7 @@ private int  promptActions(Customer cu) {
     //once inside a bank account prompt have a few options of seeing standing orders and direct debits`
     //create and delete these standing orders
     // and a lot more that i cannot think of at the moment
-    return 1;
+    return input;
 }
 private Customer searchForCustomer(){
     Scanner sc=new Scanner(System.in);
