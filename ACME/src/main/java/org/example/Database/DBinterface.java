@@ -2,7 +2,9 @@ package org.example.Database;
 
 import java.time.LocalDate;
 
-import org.example.model.*;
+import org.example.model.people.Customer;
+import org.example.model.people.Role;
+import org.example.model.people.User;
 import org.example.utils.Generator;
 
 import java.sql.*;

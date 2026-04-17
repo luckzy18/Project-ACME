@@ -1,4 +1,4 @@
-package org.example.model;
+package org.example.model.people;
 
 public class Customer {
     private String name;

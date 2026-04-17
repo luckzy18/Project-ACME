@@ -4,8 +4,8 @@ package org.example.UI;
 import java.util.Scanner;
 
 import org.example.Database.DBinterface;
-import org.example.model.User;
-import org.example.model.Customer;
+import org.example.model.people.User;
+import org.example.model.people.Customer;
 
 
 
@@ -77,8 +77,6 @@ public class MainUI {
         }
         return user;
     }
-
-
     int getMenuChoice(User user){
             String greet="\n=== 🏦 ACME Banking System ===\nWelcome, " + user.getName();
             String customerActions= """
@@ -151,7 +149,7 @@ public class MainUI {
 
 
                 //  enterCustomerMenu(cust);
-
+                  IO.print("Searching for customer");
 
                   break;
                   // getCustomerbyID information retrieved is only about the user account nothing about bank accounts

@@ -1,4 +1,5 @@
-package org.example.model;
+package org.example.model.Account;
+
 public class PersonalAccount extends Account {
     //Fields
     private String directDebits;

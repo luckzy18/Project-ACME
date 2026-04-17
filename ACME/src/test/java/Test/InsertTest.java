@@ -1,6 +1,6 @@
 package Test;
 import org.example.Database.DBinterface;
-import org.example.model.Customer;
+import org.example.model.people.Customer;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

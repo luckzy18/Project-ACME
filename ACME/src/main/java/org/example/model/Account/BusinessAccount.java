@@ -1,4 +1,4 @@
-package org.example.model;
+package org.example.model.Account;
 public class BusinessAccount extends Account {
     //Fields
     public static final double ANNUAL_FEE = 120.0;
