@@ -3,6 +3,8 @@ package org.example.model;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import org.example.model.Account.Account;
+
 public class Transaction {
     //Enums - just safer than using strings.
     public enum TransactionType {

@@ -2,6 +2,10 @@ package org.example.Database;
 
 import java.time.LocalDate;
 
+import org.example.model.Account.Account;
+import org.example.model.Account.AccountTypePolicy;
+import org.example.model.Account.ISAAccount;
+import org.example.model.Account.PersonalAccount;
 import org.example.model.people.Customer;
 import org.example.model.people.Role;
 import org.example.model.people.User;
@@ -38,7 +42,7 @@ private static Connection connect() throws Exception {
         }
     return null;
     }
-    public boolean tellerFirstLoginUpdate(String name, String password,int id){
+    public static boolean tellerFirstLoginUpdate(String name, String password,int id){
     String query="UPDATE TELLER set TELLER_NAME= ?,TELLER_PASSWORD = ? WHERE TELLER_ID=?;";
     try(Connection conn=connect();
     PreparedStatement stmt=conn.prepareStatement(query)){
@@ -183,12 +187,77 @@ private static Connection connect() throws Exception {
 //    public Account createBankAccount(User user){
 //    return new BusinessAccount();
 //    }
-//    public Account createBankAccount(User user){
-//    return new ISAAccount();
-//    }
-//    public Account createBankAccount(User user){
-//    return new PersonalAccount();
-//    }
+    public static Account createPersonalAccount(User teller,Customer cu,AccountTypePolicy acc,double balance){
+    String accountNumber=getNewAccountNumber();
+    insertBankAccount(acc,accountNumber,cu.getId(),balance);
+    insertPersonalACC(accountNumber,cu.isIdVerified());
+    return new PersonalAccount(accountNumber,cu.getId(),acc.getSortCode(),balance);
+    }
+
+    private static boolean insertPersonalACC(String accountNumber, boolean photoVerified) {
+        String query = """
+        INSERT INTO PersonalACC (account_Number, photo_ID_Verified)
+        VALUES (?, ?);
+        """;
+
+        try (Connection conn = connect();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, accountNumber);
+            stmt.setBoolean(2, photoVerified);
+
+            stmt.executeUpdate();
+            return true;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error creating personal account: " + e.getMessage(), e);
+        }
+}
+
+    private static String getNewAccountNumber(){
+        String accountNumber;
+       do{
+            accountNumber=Generator.generateAccountNumber();
+        }while(isACCunique(accountNumber));
+        return accountNumber;
+    }
+
+    private static boolean insertBankAccount(AccountTypePolicy acc, String account_Number, int customerId, double balance) {
+        String queryACC = """
+            INSERT INTO Account (account_Number, customer_ID, sort_code, balance, is_active, account_type)
+            VALUES (?, ?, ?, ?, ?, ?);
+            """;
+
+        try (Connection conn = connect();
+             PreparedStatement stmt = conn.prepareStatement(queryACC)) {
+
+            stmt.setString(1, account_Number);
+            stmt.setInt(2, customerId);
+            stmt.setString(3, acc.getSortCode());  // sort code from AccountTypePolicy
+            stmt.setDouble(4, balance);
+            stmt.setString(5, "true");
+            stmt.setString(6, acc.name());
+            stmt.executeUpdate();
+
+            return true;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error creating account: " + e.getMessage(), e);
+
+        }
+    }
+
+    public boolean isACCunique(String acountNumber){
+        String query="SELECT COUNT(*) FROM account WHERE account_number=?;";
+        try (Connection conn = connect();
+             PreparedStatement stmt =conn.prepareStatement(query)){
+            stmt.setString(1,acountNumber);
+            int count=stmt.executeUpdate();
+            return count<1;
+        }catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+}
     /// TIME TO WORK ON ACCOUNT CREATION, GENERATIONS WITHDRAW AND DEPOST
     /// GETTER FOR ALL ACCOUNTS A CUSTOMER HAS AND STORED LOCALLY ONCE FETCHED
     /// THE ACCOUNTS SHOULD BE GENERATED FIRST WITHIN 3 METHODS ONE FOR EACH ACCOUNT TYPE AN OVERLOADED METHOD WOULD WORK NICELY

@@ -18,9 +18,11 @@ public class MainUI {
             ***********************************
             """;
     private User teller;
+    private CustomerUI cUI;
 
     public MainUI(){
         this.teller=loginTeller();
+        cUI=new CustomerUI();
     }
 
     public User getTeller() {
@@ -142,11 +144,9 @@ public class MainUI {
              // at the moment I had no time to test all methods if any do not work either fix or let me know
               case 1:
                   int customerId=CustomerUI.promptCustomerID();//prompt to get id details
-                  if(customerId>0){
-                      Customer cust= DBinterface.getCustomerbyID(customerId);
-                  }
-                  CustomerUI.promptActions();
-
+                  Customer cust= DBinterface.getCustomerbyID(customerId);
+                  cUI.setCustomer(cust);
+                  cUI.start();
 
                 //  enterCustomerMenu(cust);
                   IO.print("Searching for customer");
@@ -160,6 +160,8 @@ public class MainUI {
               case 3:
                   IO.print("Remove Customer");
                   // not fully working we can look at it once we can manage accounts
+                  // NEEDS TO BE MOVED INTO CUSTOMER MENU,
+                  // PLEASE REMOVE THIS OPTION AND REFACTOR UI ACCORDINGLY TO REMOVE THIS OPTION FROM HERE
                   break;
               case 4:
                   IO.print("log out");
