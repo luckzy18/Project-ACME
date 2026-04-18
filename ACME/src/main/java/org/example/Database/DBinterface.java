@@ -24,7 +24,7 @@ private static Connection connect() throws Exception {
     String query="INSERT INTO TELLER(teller_Password,teller_role) VALUES(??);";
     String password="temp"+ Generator.generateTemporaryPassword();
     try (Connection conn = connect();
-         PreparedStatement stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);){
+         PreparedStatement stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)){
             stmt.setString(1,password);
             stmt.setString(2,"TELLER");
             stmt.executeUpdate();
@@ -188,16 +188,41 @@ private static Connection connect() throws Exception {
 //    public Account createBankAccount(User user){
 //    return new BusinessAccount();
 //    }
-public static Account createBusinessAccount(User teller,Customer cu,AccountTypePolicy acc,double balance){
-    IO.println("creating acc");
+public static Account createBusinessAccount(User teller,Customer cu,AccountTypePolicy acc,double balance,String businessType){
+    IO.println("creating business Account.");
     String accountNumber=getNewAccountNumber();
     IO.println("acc_number is: "+accountNumber);
     insertBankAccount(acc,accountNumber,cu.getId(),balance);
-    insertBusinessACC(accountNumber,cu.isIdVerified());
-    return new BusinessAccount();
+    insertBusinessACC(accountNumber,businessType);
+    return new BusinessAccount(accountNumber,cu.getId(),acc.getSortCode(),balance);
 }
 
-    private static void insertBusinessACC(String accountNumber, boolean idVerified) {
+    private static boolean insertBusinessACC(String accountNumber,String businessType) {
+    String query= """ 
+            INSERT INTO BUSINESSACC (account_number, chequeBook, overdraft_amount, overdraft, loan_request, bussiness_type, international_trading)
+            VALUES (?,?,?,?,?,?,?);
+            """;
+    boolean chequeBook=false;
+    int overdraftAmount=100;
+    boolean overdraft=false;
+    boolean loanRequest=false;
+    boolean internationalTrading=false;
+        try (Connection conn = connect();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, accountNumber);
+            stmt.setBoolean(2, chequeBook);        // boolean
+            stmt.setInt(3, overdraftAmount);
+            stmt.setBoolean(4, overdraft);         // boolean
+            stmt.setBoolean(5, loanRequest);       // boolean
+            stmt.setString(6, businessType);
+            stmt.setBoolean(7, internationalTrading); // boolean
+
+            int rowsAffected=stmt.executeUpdate();
+            return rowsAffected>0;
+        } catch (Exception e) {
+            throw new RuntimeException("Error creating business account: " + e.getMessage(), e);
+        }
     }
 
     public static Account createPersonalAccount(User teller,Customer cu,AccountTypePolicy acc,double balance){

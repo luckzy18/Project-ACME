@@ -14,6 +14,7 @@ public class CustomerUI {
     // Fields
     private User teller;
     private Customer customer;
+    private Scanner sc=new Scanner(System.in);
 
     // Constructor
     public Customer getCustomer() {
@@ -49,24 +50,31 @@ public class CustomerUI {
 
     private void createACC(){
         Scanner sc=new Scanner(System.in);
-        IO.println("1 personal, 2 ISA, 3 business");
+        IO.println("1 personal, 2 business, 3 ISA");
         int userInput=sc.nextInt();// make this choose between the types of account that can be created.
-        AccountTypePolicy acc;// must take an input and choose the acc type t
+        sc.nextLine();
         IO.println("Client first deposit: ");
-        double startingMoney=sc.nextInt();
-        sc.close();
+        double startingMoney=sc.nextDouble();
+        sc.nextLine();
+
+        AccountTypePolicy acc;
+
+
         switch (userInput){
             case 1->{
                 IO.println("creating personal Account.");
                 acc=AccountTypePolicy.PERSONAL;
-                Account a=DBinterface.createPersonalAccount(this.teller,customer,acc,10);//
-                IO.println(a);
+                Account a=DBinterface.createPersonalAccount(this.teller,customer,acc,startingMoney);//
+                IO.println(a.toString());
             }//create personal
             case 2->{
+                IO.println("business type: ");
+                String businessType=sc.nextLine();
+                businessType=businessType.strip();
                 IO.println("creating Business Account.");
                 acc=AccountTypePolicy.BUSINESS;
-                Account a=DBinterface.createPersonalAccount(this.teller,customer,acc,10);//
-                IO.println(a);
+                Account a=DBinterface.createBusinessAccount(this.teller,customer,acc,startingMoney,businessType);//
+                IO.println(a.toString());
             }
             case 3->{
                 IO.println("creating Business Account.");
@@ -75,6 +83,7 @@ public class CustomerUI {
                 IO.println(a);
             }
         }
+
     }
 
 public void performAction(int actionInput){
@@ -106,6 +115,7 @@ private int  promptActions(Customer cu) {
     //once inside a bank account prompt have a few options of seeing standing orders and direct debits`
     //create and delete these standing orders
     // and a lot more that i cannot think of at the moment
+
     return input;
 }
 private Customer searchForCustomer(){
@@ -119,7 +129,7 @@ private Customer searchForCustomer(){
     }
     int inp=Integer.parseInt(input);
     Customer cust=DBinterface.getCustomerbyID(inp);
-    sc.close();
+
 
     return cust;
 }
