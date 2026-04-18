@@ -2,10 +2,7 @@ package org.example.Database;
 
 import java.time.LocalDate;
 
-import org.example.model.Account.Account;
-import org.example.model.Account.AccountTypePolicy;
-import org.example.model.Account.ISAAccount;
-import org.example.model.Account.PersonalAccount;
+import org.example.model.Account.*;
 import org.example.model.people.Customer;
 import org.example.model.people.Role;
 import org.example.model.people.User;
@@ -191,6 +188,18 @@ private static Connection connect() throws Exception {
 //    public Account createBankAccount(User user){
 //    return new BusinessAccount();
 //    }
+public static Account createBusinessAccount(User teller,Customer cu,AccountTypePolicy acc,double balance){
+    IO.println("creating acc");
+    String accountNumber=getNewAccountNumber();
+    IO.println("acc_number is: "+accountNumber);
+    insertBankAccount(acc,accountNumber,cu.getId(),balance);
+    insertBusinessACC(accountNumber,cu.isIdVerified());
+    return new BusinessAccount();
+}
+
+    private static void insertBusinessACC(String accountNumber, ) {
+    }
+
     public static Account createPersonalAccount(User teller,Customer cu,AccountTypePolicy acc,double balance){
     IO.println("creating acc");
     String accountNumber=getNewAccountNumber();

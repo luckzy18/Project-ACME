@@ -48,21 +48,35 @@ public class CustomerUI {
 
 
     private void createACC(){
-        int userInput=1;// make this choose between the types of account that can be created.
+        Scanner sc=new Scanner(System.in);
+        IO.println("1 personal, 2 ISA, 3 business");
+        int userInput=sc.nextInt();// make this choose between the types of account that can be created.
         AccountTypePolicy acc;// must take an input and choose the acc type t
-        // a method to request the common input for all accounts
+        IO.println("Client first deposit: ");
+        double startingMoney=sc.nextInt();
+        sc.close();
         switch (userInput){
-            case 1://create personal
+            case 1->{
                 IO.println("creating personal Account.");
                 acc=AccountTypePolicy.PERSONAL;
                 Account a=DBinterface.createPersonalAccount(this.teller,customer,acc,10);//
                 IO.println(a);
-            case 2:// create isa
-            case 3://create business
-
+            }//create personal
+            case 2->{
+                IO.println("creating Business Account.");
+                acc=AccountTypePolicy.BUSINESS;
+                Account a=DBinterface.createPersonalAccount(this.teller,customer,acc,10);//
+                IO.println(a);
+            }
+            case 3->{
+                IO.println("creating Business Account.");
+                acc=AccountTypePolicy.ISA;
+                Account a=DBinterface.createPersonalAccount(this.teller,customer,acc,10);//
+                IO.println(a);
+            }
         }
-
     }
+
 public void performAction(int actionInput){
         // this method performs different actions based on promptaction chosen
         switch(actionInput){
