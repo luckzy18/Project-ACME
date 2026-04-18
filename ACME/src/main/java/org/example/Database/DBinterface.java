@@ -2,7 +2,13 @@ package org.example.Database;
 
 import java.time.LocalDate;
 
-import org.example.model.*;
+import org.example.model.Account.Account;
+import org.example.model.Account.AccountTypePolicy;
+import org.example.model.Account.ISAAccount;
+import org.example.model.Account.PersonalAccount;
+import org.example.model.people.Customer;
+import org.example.model.people.Role;
+import org.example.model.people.User;
 import org.example.utils.Generator;
 
 import java.sql.*;
@@ -17,7 +23,7 @@ private static Connection connect() throws Exception {
     return DriverManager.getConnection(URL);
 }
 
-    public String[] generateNewTeller(){
+    public static String[] generateNewTeller(){
     String query="INSERT INTO TELLER(teller_Password,teller_role) VALUES(??);";
     String password="temp"+ Generator.generateTemporaryPassword();
     try (Connection conn = connect();
@@ -36,7 +42,7 @@ private static Connection connect() throws Exception {
         }
     return null;
     }
-    public boolean tellerFirstLoginUpdate(String name, String password,int id){
+    public static boolean tellerFirstLoginUpdate(String name, String password,int id){
     String query="UPDATE TELLER set TELLER_NAME= ?,TELLER_PASSWORD = ? WHERE TELLER_ID=?;";
     try(Connection conn=connect();
     PreparedStatement stmt=conn.prepareStatement(query)){
@@ -102,22 +108,26 @@ private static Connection connect() throws Exception {
     public static Customer getCustomerbyID(Integer id){
         String query= "SELECT * FROM Customer WHERE customer_ID=? ;";
         Customer us=null;
+
         try (Connection conn = connect();
              PreparedStatement stmt =conn.prepareStatement(query)){
             stmt.setInt(1,id);
 
-
             ResultSet rs=stmt.executeQuery();
+
             if (rs.next()){
                 String name=rs.getString("customer_name");
                 boolean idVerified=rs.getBoolean("id_verified");
                 boolean addressVerified=rs.getBoolean("address_verified");
                 String date=rs.getString("customer_signup_date");
+                IO.println("customer found: "+name);
                 us=new Customer(name,id,date,addressVerified,idVerified);
                 return us;
-            }else{
-               return us;
+            }else {
+                IO.println("No customer found with ID: " + id);
             }
+            return us;
+
 
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -181,12 +191,85 @@ private static Connection connect() throws Exception {
 //    public Account createBankAccount(User user){
 //    return new BusinessAccount();
 //    }
-//    public Account createBankAccount(User user){
-//    return new ISAAccount();
-//    }
-//    public Account createBankAccount(User user){
-//    return new PersonalAccount();
-//    }
+    public static Account createPersonalAccount(User teller,Customer cu,AccountTypePolicy acc,double balance){
+    IO.println("creating acc");
+    String accountNumber=getNewAccountNumber();
+    IO.println("acc_number is: "+accountNumber);
+    insertBankAccount(acc,accountNumber,cu.getId(),balance);
+    insertPersonalACC(accountNumber,cu.isIdVerified());
+    return new PersonalAccount(accountNumber,cu.getId(),acc.getSortCode(),balance);
+    }
+
+    private static boolean insertPersonalACC(String accountNumber, boolean photoVerified) {
+        String query = """
+        INSERT INTO PersonalACC (account_Number, photo_ID_Verified)
+        VALUES (?, ?);
+        """;
+
+        try (Connection conn = connect();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, accountNumber);
+            stmt.setBoolean(2, photoVerified);
+
+            stmt.executeUpdate();
+            return true;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error creating personal account: " + e.getMessage(), e);
+        }
+}
+
+    private static String getNewAccountNumber(){
+        String accountNumber;
+       do{
+            accountNumber=Generator.generateAccountNumber();
+
+        }while(!isACCunique(accountNumber));
+        return accountNumber;
+    }
+
+    private static boolean insertBankAccount(AccountTypePolicy acc, String account_Number, int customerId, double balance) {
+    IO.println("account inserted");
+    String queryACC = """
+            INSERT INTO Account (account_Number, customer_ID, sort_code, balance, is_active, account_type)
+            VALUES (?, ?, ?, ?, ?, ?);
+            """;
+
+        try (Connection conn = connect();
+             PreparedStatement stmt = conn.prepareStatement(queryACC)) {
+
+            stmt.setString(1, account_Number);
+            stmt.setInt(2, customerId);
+            stmt.setString(3, acc.getSortCode());  // sort code from AccountTypePolicy
+            stmt.setDouble(4, balance);
+            stmt.setString(5, "true");
+            stmt.setString(6, acc.name());
+            stmt.executeUpdate();
+
+            return true;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error creating account: " + e.getMessage(), e);
+
+        }
+    }
+
+    public static boolean isACCunique(String acountNumber){
+        String query="SELECT COUNT(*) FROM account WHERE account_number=?;";
+        try (Connection conn = connect();
+             PreparedStatement stmt =conn.prepareStatement(query)){
+            stmt.setString(1,acountNumber);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                int count = rs.getInt(1);
+                return count == 0; // true if no account with that number exists
+            }
+            return false;
+        }catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+}
     /// TIME TO WORK ON ACCOUNT CREATION, GENERATIONS WITHDRAW AND DEPOST
     /// GETTER FOR ALL ACCOUNTS A CUSTOMER HAS AND STORED LOCALLY ONCE FETCHED
     /// THE ACCOUNTS SHOULD BE GENERATED FIRST WITHIN 3 METHODS ONE FOR EACH ACCOUNT TYPE AN OVERLOADED METHOD WOULD WORK NICELY

@@ -1,6 +1,7 @@
 package Test;
 import org.example.Database.DBinterface;
-import org.example.model.Customer;
+import org.example.model.Account.Overdraft;
+import org.example.model.people.Customer;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -24,5 +25,43 @@ public class InsertTest {
     }
     @Test
     void testInsertCustomer() {}
+
+    @Test
+    void testCalculateMonthlyInterest_WhenInOverdraft() {
+        Overdraft overdraft = new Overdraft();
+        overdraft.setOverdraftBalance(-200); // £200 overdraft
+
+        double interest = overdraft.calculateMonthlyInterest();
+
+        // 1.5% of 200 = 3.0
+        Assert.assertEquals(3.0, interest, 0.0001);
+    }
+
+    @Test
+    void testCalculateMonthlyInterest_WhenNotInOverdraft() {
+        Overdraft overdraft = new Overdraft();
+        overdraft.setOverdraftBalance(100); // positive balance
+
+        double interest = overdraft.calculateMonthlyInterest();
+
+        Assert.assertEquals(0.0, interest, 0.0001);
+    }
+
+    @Test
+    void testGetCustomerById(){
+        Customer cust=DBinterface.getCustomerbyID(1);
+
+        Assert.assertTrue(cust!=null);
+    }
+
+    @Test
+    void testCalculateMonthlyInterest_WhenZeroBalance() {
+        Overdraft overdraft = new Overdraft();
+        overdraft.setOverdraftBalance(0);
+
+        double interest = overdraft.calculateMonthlyInterest();
+
+        Assert.assertEquals(0.0, interest, 0.0001);
+    }
 
 }

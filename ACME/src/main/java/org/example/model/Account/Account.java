@@ -1,4 +1,4 @@
-package org.example.model;
+package org.example.model.Account;
 public abstract class Account {
     //Fields
     private String accountNumber;

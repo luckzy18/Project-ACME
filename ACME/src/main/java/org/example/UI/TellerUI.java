@@ -1,5 +1,5 @@
 package org.example.UI;
-public class Teller {
+public class TellerUI {
 
 
     // Fields
@@ -10,7 +10,7 @@ public class Teller {
 
     // Constructor
 
-    public Teller(String tellerId, String password) {
+    public TellerUI(String tellerId, String password) {
         this.tellerId = tellerId;
         this.password = password;
     }

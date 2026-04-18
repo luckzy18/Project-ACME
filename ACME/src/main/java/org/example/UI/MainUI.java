@@ -4,11 +4,34 @@ package org.example.UI;
 import java.util.Scanner;
 
 import org.example.Database.DBinterface;
-import org.example.model.User;
-import org.example.model.Customer;
+import org.example.model.people.User;
+import org.example.model.people.Customer;
+
 
 
 public class MainUI {
+
+
+    private static String logo= """
+            ***********************************
+                 ACME BANK TELLER SYSTEM
+            ***********************************
+            """;
+    private User teller;
+    private CustomerUI cUI;
+
+    public CustomerUI getcUI() {
+        return cUI;
+    }
+
+    public void setcUI(CustomerUI cUI) {
+        this.cUI = cUI;
+    }
+
+    public MainUI(){
+        this.teller=loginTeller();
+        this.cUI=new CustomerUI();
+    }
 
     public User getTeller() {
         return teller;
@@ -18,19 +41,26 @@ public class MainUI {
         this.teller = teller;
     }
 
-    private User teller;
+    public void start(){
+        int input=-1;
+        do{
+            input=getMenuChoice(this.teller);
+            performAction(input);
+        }while(input!=5);
+        IO.println("Shutting down");
+    }
+
+
+
 
 
     User loginTeller(){//logs in teller
         Scanner scanner = new Scanner(System.in);
         boolean loginSuccess = false;
+
         // Teller Login Prompt
 
-
-
-        System.out.println("***********************************");
-        System.out.println("      ACME BANK TELLER SYSTEM");
-        System.out.println("***********************************");
+        IO.println(logo);
         System.out.print("Please enter Teller ID: ");
         String enteredTellerId = scanner.nextLine();
         System.out.print("Please enter Password: ");
@@ -68,10 +98,10 @@ public class MainUI {
                                 5. Exit
                     """;
             String adminActions= """
-                    "--- Admin Actions ---");
-                                    IO.println("6. Generate one-time login code");
-                                    IO.println("7. View tellers");
-                                    IO.println("8. Remove teller");
+                                    --- Admin Actions ---
+                                    6. Generate one-time login code
+                                    7. View tellers
+                                    8. Remove teller
                     """;
             IO.println(greet);
             IO.println(customerActions);
@@ -101,7 +131,8 @@ public class MainUI {
                         System.out.println("You chose: " + choice);
                         invalidOption=false;
                     }else {
-                        System.out.println("Please enter a valid number:.");
+                        System.out.println(choice +" is not a valid input");
+                        System.out.println("Please enter a valid input:.");
                     }
 
                 } catch (NumberFormatException e) {
@@ -112,21 +143,16 @@ public class MainUI {
 
     }
 
-      void main() {
-        teller=loginTeller();
-        //tellerFirstLoginUpdate has to be checked if name field is empty and be added to prompt teller to change password and add name
-          int choice=getMenuChoice(teller);
+       void performAction(int choice) {
           switch (choice){
               // for anyone working on this please check method signature in dbinterface
                 // the return values should be displayed to the user for a reason if you think some return values need altering either do it or ask for help
              // at the moment I had no time to test all methods if any do not work either fix or let me know
               case 1:
-                  Customer cust=getCustomer();
-                //  enterCustomerMenu(cust);
-                  IO.print("Searching for customer");
+                  cUI.start();
 
                   break;
-                  // getCustomerbyID information retrieved is only about the user account nothing about bank accounts
+                  // getCustomerbyID information retrieved is only about the customer account nothing about bank accounts
               case 2:
                   IO.print("inserting Customer ");
                 //  insertCustomer gets an id back which is required for users to log in.
@@ -134,6 +160,8 @@ public class MainUI {
               case 3:
                   IO.print("Remove Customer");
                   // not fully working we can look at it once we can manage accounts
+                  // NEEDS TO BE MOVED INTO CUSTOMER MENU,
+                  // PLEASE REMOVE THIS OPTION AND REFACTOR UI ACCORDINGLY TO REMOVE THIS OPTION FROM HERE
                   break;
               case 4:
                   IO.print("log out");
@@ -146,8 +174,9 @@ public class MainUI {
 
              // Could be worth to move the admin actions into a different class cleaning tasks
               case 6:
-                  IO.print("generate the login details for a new user");
-                  //generateNewTeller
+                  IO.print("Generating new login details:");
+
+                  String [] loginDetails=DBinterface.generateNewTeller();
                   break;
               case 7:
                   IO.print("get all tellers");
@@ -156,29 +185,6 @@ public class MainUI {
                   IO.print("delete teller");
                   //deleteTellerbyID method deletes the teller if the id is inserted except for admin
           }
-    }
-    Customer getCustomer(){
-        Scanner sc=new Scanner(System.in);
-
-        IO.println("Please enter customer ID: ");
-        String input=sc.nextLine();
-        while(!isInt(input)){
-            IO.println("Invalid input");
-            IO.println("Please enter a customer ID: ");
-        }
-        int inp=Integer.parseInt(input);
-        Customer cust=DBinterface.getCustomerbyID(inp);
-        sc.close();
-
-        return cust;
-    }
-    private static boolean isInt(String input) {
-        try {
-            Integer.parseInt(input);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
     }
 }
 

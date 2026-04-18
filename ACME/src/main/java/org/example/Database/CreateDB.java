@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.Date;
 
 public class CreateDB {
 
@@ -33,15 +34,27 @@ public class CreateDB {
                 """;
         String createAccount = """
                 CREATE TABLE IF NOT EXISTS Account (
-                    account_Number      VARCHAR PRIMARY KEY,
-                    customer_ID     TEXT NOT NULL,
+                    account_Number      TEXT PRIMARY KEY,
+                    customer_ID     INTEGER NOT NULL,
                     sort_code       TEXT NOT NULL,
-                    balance         TEXT NOT NULL,
+                    balance         REAL NOT NULL,
                     is_active TEXT NOT NULL,
                     account_type TEXT NOT NULL,
-                    FOREIGN KEY (customer_ID) REFERENCES CUSTOMER(customer_id)
+                    FOREIGN KEY (customer_ID) REFERENCES CUSTOMER(customer_ID)
                 );
                 """;
+        String createOverdraft = """
+                CREATE TABLE IF NOT EXISTS Overdraft (
+                    account_number TEXT PRIMARY KEY,
+                    overdraft_balance REAL NOT NULL,
+                    max_overdraft REAL NOT NULL DEFAULT 100,
+                    overdraft_start TEXT,
+                    FOREIGN KEY (account_number) REFERENCES Account(account_number)
+    );
+""";
+
+
+
         String createPersonalAccount= """
                 CREATE TABLE IF NOT EXISTS PersonalACC (
                     account_Number TEXT PRIMARY KEY NOT NULL,
@@ -84,6 +97,7 @@ public class CreateDB {
             IO.println("ISA account created");
             stmt.execute(createBusinessAccount);
             IO.println("business account created");
+            stmt.execute(createOverdraft);
             System.out.println("Tables created successfully.");
             initialiseMainTeller();
         } catch (Exception e) {

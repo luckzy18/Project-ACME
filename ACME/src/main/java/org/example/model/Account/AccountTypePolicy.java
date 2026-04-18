@@ -1,9 +1,12 @@
-package org.example.model;
+package org.example.model.Account;
 
 public enum AccountTypePolicy {
     PERSONAL("60-60-60", AccountLimitPolicy.MULTIPLE),
     ISA("60-60-70", AccountLimitPolicy.SINGLE),
     BUSINESS("60-70-70",AccountLimitPolicy.MULTIPLE);
+//    private static String personalACCString="60-60-60";
+//    private static String ISAACCString;
+//    private static String businessACCString;
 
     private final String sortCode;
     private final String accountLimit;
