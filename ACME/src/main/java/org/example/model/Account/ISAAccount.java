@@ -4,6 +4,7 @@ public class ISAAccount extends Account {
     //Fields
     private double annualInterestRate;
     private double annualAverageBalance;
+    private Overdraft overdraft;
 
     //Constructor matching super
     public ISAAccount(String accountNumber, int customerID, String sortCode, double balance) {

@@ -19,14 +19,7 @@ public class MainUI {
             """;
     private User teller;
     private CustomerUI cUI;
-
-    public CustomerUI getcUI() {
-        return cUI;
-    }
-
-    public void setcUI(CustomerUI cUI) {
-        this.cUI = cUI;
-    }
+    Scanner sc=new Scanner(System.in);
 
     public MainUI(){
         this.teller=loginTeller();
@@ -143,48 +136,69 @@ public class MainUI {
 
     }
 
-       void performAction(int choice) {
-          switch (choice){
-              // for anyone working on this please check method signature in dbinterface
+    void performAction(int choice) {
+        switch (choice) {
+
+            case 1 -> {
+                // for anyone working on this please check method signature in dbinterface
                 // the return values should be displayed to the user for a reason if you think some return values need altering either do it or ask for help
-             // at the moment I had no time to test all methods if any do not work either fix or let me know
-              case 1:
-                  cUI.start();
+                // at the moment I had no time to test all methods if any do not work either fix or let me know
+                cUI.start();
+            }
 
-                  break;
-                  // getCustomerbyID information retrieved is only about the customer account nothing about bank accounts
-              case 2:
-                  IO.print("inserting Customer ");
-                //  insertCustomer gets an id back which is required for users to log in.
-                  break;
-              case 3:
-                  IO.print("Remove Customer");
-                  // not fully working we can look at it once we can manage accounts
-                  // NEEDS TO BE MOVED INTO CUSTOMER MENU,
-                  // PLEASE REMOVE THIS OPTION AND REFACTOR UI ACCORDINGLY TO REMOVE THIS OPTION FROM HERE
-                  break;
-              case 4:
-                  IO.print("log out");
-                  //run the start screen again and have a goodbye message
-                  break;
-              case 5:
-                  IO.print("Exit");
-                  //shut down the system with something like sys.exit(0) and a closing message
-                  break;
+            case 2 -> {
 
-             // Could be worth to move the admin actions into a different class cleaning tasks
-              case 6:
-                  IO.print("Generating new login details:");
+                // getCustomerbyID information retrieved is only about the customer account nothing about bank accounts
+                IO.print("inserting Customer ");
+                cUI.createNewCustomer();
+                // insertCustomer gets an id back which is required for users to log in.
+            }
 
-                  String [] loginDetails=DBinterface.generateNewTeller();
-                  break;
-              case 7:
-                  IO.print("get all tellers");
-                  //getAllTellers in a readable format will fetch all tellers. if you want to change the way this is displayed go into dbinterface
-              case 8:
-                  IO.print("delete teller");
-                  //deleteTellerbyID method deletes the teller if the id is inserted except for admin
-          }
+            case 3 -> {
+                IO.print("Remove Customer");
+                // not fully working we can look at it once we can manage accounts
+                // NEEDS TO BE MOVED INTO CUSTOMER MENU,
+            }
+            case 4 -> {// not tested
+                IO.print("logged out");
+                this.teller=loginTeller();
+                // run the start screen again and have a goodbye message
+            }
+
+            case 5 -> {
+                IO.print("Good bye");
+            }
+
+            // Could be worth to move the admin actions into a different class cleaning tasks
+            case 6 -> {
+                IO.print("Generating new login details:");
+                String[] loginDetails = DBinterface.generateNewTeller();
+            }
+
+            case 7 -> {
+                IO.print("get all tellers");
+                // getAllTellers in a readable format will fetch all tellers.
+                // if you want to change the way this is displayed go into dbinterface
+            }
+
+            case 8 -> {
+                IO.print("delete teller");
+                deleteTeller();
+                // deleteTellerbyID method deletes the teller if the id is inserted except for admin
+            }
+
+            default -> {
+                IO.print("Invalid option.");
+            }
+        }
+    }
+    private boolean deleteTeller(){
+        IO.println("please insert teller ID: ");
+        int ID=sc.nextInt();
+
+
+
+
     }
 }
 
