@@ -167,7 +167,12 @@ public class MainUI {
 
                 // getCustomerbyID information retrieved is only about the customer account nothing about bank accounts
                 IO.print("inserting Customer ");
-                cUI.createNewCustomer();
+                Customer c=cUI.createNewCustomer();
+                if(c!=null){
+                    IO.println(c);
+                }else{
+                    IO.println("We could not create an account at this time.");
+                }
                 // insertCustomer gets an id back which is required for users to log in.
             }
 

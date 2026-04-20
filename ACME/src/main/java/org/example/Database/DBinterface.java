@@ -70,21 +70,23 @@ private static Connection connect() throws Exception {
 
 }
 
-    public static Integer  insertCustomer (String name,boolean addressVerfied,boolean identityVerified){
+    public static Customer  insertCustomer (String name,boolean addressVerfied,boolean identityVerified){
     String insertCustomer="Insert into Customer(customer_name,address_verified,id_verified,customer_signup_date)" +
             " Values(?,?,?,?)";
+    String date=LocalDate.now().toString();
     try (Connection conn = connect();
          PreparedStatement stmt = conn.prepareStatement(insertCustomer, Statement.RETURN_GENERATED_KEYS);){
          stmt.setString(1,name);
          stmt.setBoolean(2,addressVerfied);
          stmt.setBoolean(3,identityVerified);
-         stmt.setString(4, LocalDate.now().toString());
+         stmt.setString(4, date);
 
          stmt.executeUpdate();
 
          ResultSet rs=stmt.getGeneratedKeys();
          if(rs.next()){
-             return rs.getInt(1);
+             return new Customer(name,rs.getInt(1),date,true,true);
+
          }
     }catch(Exception e){
         e.printStackTrace();

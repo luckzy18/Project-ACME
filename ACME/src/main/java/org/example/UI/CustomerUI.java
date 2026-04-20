@@ -348,7 +348,7 @@ private static boolean isInt(String input) {
     }
 }
 
-    public void createNewCustomer() {
+    public Customer createNewCustomer() {
         IO.println("Please enter customer full name: ");
         String name=sc.next();
         sc.nextLine();
@@ -358,8 +358,9 @@ private static boolean isInt(String input) {
         String input=sc.next();
         sc.nextLine();
         if(input.equalsIgnoreCase("y")){
-
+           return DBinterface.insertCustomer(name,true,true);
         }
+        return null;
     }
 }
 
