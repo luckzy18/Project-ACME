@@ -36,7 +36,7 @@ public abstract class Account {
     @Override
     public String toString() {
         return String.format(
-                "Account Number: | Sort Code: %s | Balance: £%.2f",
+                "Account Number: %s | Sort Code: %s | Balance: £%.2f",
                 accountNumber, sortCode, balance
         );
     }
