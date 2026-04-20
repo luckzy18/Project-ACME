@@ -90,8 +90,8 @@ public class CreateDB {
                 source TEXT,
                 
                 teller_ID INTEGER NOT NULL,
-                customer_ID INTEGER NOT NULL,
-                account_number TEXT NOT NULL,
+                customer_ID INTEGER,
+                account_number TEXT,
                 
                 FOREIGN KEY (teller_ID) REFERENCES Teller(teller_ID),
                 FOREIGN KEY (customer_ID) REFERENCES Customer(customer_ID),

@@ -13,13 +13,13 @@ import org.example.model.people.Customer;
 public class MainUI {
 
 
-    private static String logo= """
+    private static final String logo= """
             ***********************************
                  ACME BANK TELLER SYSTEM
             ***********************************
             """;
     private User teller;
-    private CustomerUI cUI;
+    private final CustomerUI cUI;
     Scanner sc=new Scanner(System.in);
 
     public MainUI(){
