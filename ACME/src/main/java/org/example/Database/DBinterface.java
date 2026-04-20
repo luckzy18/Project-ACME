@@ -23,17 +23,17 @@ private static Connection connect() throws Exception {
 
 
     public static String[] generateNewTeller(){
-    String query="INSERT INTO TELLER(teller_Password,teller_role) VALUES(??);";
+    String query="INSERT INTO TELLER(teller_Password,teller_role) VALUES(?,?);";
     String password="temp"+ Generator.generateTemporaryPassword();
     try (Connection conn = connect();
          PreparedStatement stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)){
             stmt.setString(1,password);
-            stmt.setString(2,"TELLER");
+            stmt.setString(2,Role.TEMPORARY.toString());
             stmt.executeUpdate();
 
             ResultSet rs=stmt.getGeneratedKeys();
             if(rs.next()){
-                String[] output= {rs.getString(1),password};
+                String[] output= {String.valueOf(rs.getInt(1)),password};
                 return output;
             }
             }catch(Exception e){
@@ -41,20 +41,7 @@ private static Connection connect() throws Exception {
         }
     return null;
     }
-    public static boolean tellerFirstLoginUpdate(String name, String password,int id){
-    String query="UPDATE TELLER set TELLER_NAME= ?,TELLER_PASSWORD = ? WHERE TELLER_ID=?;";
-    try(Connection conn=connect();
-    PreparedStatement stmt=conn.prepareStatement(query)){
-        stmt.setString(1,name);
-        stmt.setString(2,password);
-        stmt.setInt(3,id);
-        int rowsAffected=stmt.executeUpdate();
-        return rowsAffected>0;
-    } catch (Exception e) {
-        throw new RuntimeException(e);
-    }
 
-    }
 
     public static User tellerTryLogin(String id, String password) {
     String query= "SELECT * FROM TELLER WHERE teller_ID=? and teller_password=?";
@@ -66,8 +53,9 @@ private static Connection connect() throws Exception {
 
     ResultSet rs=stmt.executeQuery();
     if (rs.next()){
+        String role=rs.getString("teller_role");
        String name=rs.getString("teller_Name");
-       String role=rs.getString("teller_role");
+
        Role rl=Role.valueOf(role);
        us=new User(Integer.parseInt(id),name,password,rl);
        return us;
@@ -489,6 +477,11 @@ private static Connection connect() throws Exception {
         }
 
         return null; // Teller not found or error
+    }
+
+    public static boolean updateTellerName(User user, String name) {
+    IO.println("TO DO MAKE THIS WORK AS THIS METHOD IS EMPTY.");
+    return false;
     }
 
     /// TIME TO WORK ON ACCOUNT CREATION, GENERATIONS WITHDRAW AND DEPOST

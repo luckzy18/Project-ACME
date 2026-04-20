@@ -4,6 +4,7 @@ package org.example.UI;
 import java.util.Scanner;
 
 import org.example.Database.DBinterface;
+import org.example.model.people.Role;
 import org.example.model.people.User;
 import org.example.model.people.Customer;
 
@@ -64,6 +65,11 @@ public class MainUI {
             count++;
              user=DBinterface.tellerTryLogin(enteredTellerId,enteredPassword);
             if(user != null){
+                if(user.getRole()==Role.TEMPORARY){
+                   if (!setUpUsername(user)) {
+                        continue;
+                   }
+                }
                 loginSuccess = true;
                 break;
             }
@@ -80,6 +86,16 @@ public class MainUI {
         }
         return user;
     }
+
+    private boolean setUpUsername(User user) {
+        IO.println("WELCOME TO ACME BANK.");
+        IO.println("What is your name?: ");
+        String name=sc.nextLine();
+        boolean updateSucess=DBinterface.updateTellerName(user,name);
+        return updateSucess;
+    }
+
+
     int getMenuChoice(User user){
             String greet="\n=== 🏦 ACME Banking System ===\nWelcome, " + user.getName();
             String customerActions= """
@@ -173,6 +189,9 @@ public class MainUI {
             case 6 -> {
                 IO.print("Generating new login details:");
                 String[] loginDetails = DBinterface.generateNewTeller();
+                IO.println(String.format("New login details → Username: %s | Passcode: %s",
+                        loginDetails[0], loginDetails[1]));
+
                 IO.println("Please prompt the new teller to use the one time passcode and log in as quickly as possible.");
             }
 
