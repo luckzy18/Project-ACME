@@ -3,8 +3,7 @@ public class BusinessAccount extends Account {
     //Fields
     public static final double ANNUAL_FEE = 120.0;
     private boolean chequeBook; //I'll change this later
-    private boolean overdraft;
-    private double overdraftAmount;
+    private Overdraft overdraft;
     private boolean loanRequest;
     private String businessType;
     private boolean internationalTrading;//I'll also change this later
@@ -13,8 +12,6 @@ public class BusinessAccount extends Account {
     public BusinessAccount(String accountNumber, int customerID, String sortCode, double balance,String businessType) {
         super(accountNumber, customerID, sortCode, balance);
         this.businessType = businessType;
-        this.overdraftAmount = 0.0; //Subject to change
-        this.overdraft = false;
         this.chequeBook = false;
         this.loanRequest = false;
         this.internationalTrading = false;
@@ -46,5 +43,14 @@ public class BusinessAccount extends Account {
     }
 
     //Methods
-
+    @Override
+    public String toString() {
+        String overdraftInfo = (overdraft != null)
+                ? String.format("Yes (£%.2f)", overdraft.GetMaxOverdraft())
+                : "No";
+        return super.toString() + String.format(
+                " | Business Type: %s | Active Overdraft: %s",
+                businessType, overdraftInfo
+        );
+    }
 }
