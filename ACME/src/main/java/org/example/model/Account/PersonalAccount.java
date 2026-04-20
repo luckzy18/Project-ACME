@@ -2,6 +2,7 @@ package org.example.model.Account;
 
 public class PersonalAccount extends Account {
     //Fields
+    private Overdraft overdraft;
     private String directDebits;
     private String standingOrders; //Both strings until I confirm how we want to handle this.
 
@@ -31,7 +32,9 @@ public class PersonalAccount extends Account {
     //Methods
     //Withdraw — overrides Account.withdraw()
     @Override
-    public void withdraw(double amount) { }
+    public boolean withdraw(double amount) {
+        return false;
+    }
 
     //Add a direct debit to this account
     public void addDirectDebit(int payment) { }

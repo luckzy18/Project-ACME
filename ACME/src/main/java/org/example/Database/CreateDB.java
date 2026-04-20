@@ -75,7 +75,7 @@ public class CreateDB {
                 overdraft_amount INTEGER NOT NULL,
                 overdraft boolean not null,
                 loan_request boolean not null,
-                bussiness_type TEXT NOT NULL,
+                business_type TEXT NOT NULL,
                 international_trading boolean NOT NULL,
                 FOREIGN KEY (account_number) REFERENCES Account(account_number)
                  )

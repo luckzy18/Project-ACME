@@ -5,8 +5,7 @@ public abstract class Account {
     private int customerID;
     private String sortCode;
     private double balance;
-    //private String startDate;
-    //private String expiryDate;
+
 
     //Constructor
     public Account(String accountNumber, int customerID, String sortCode, double balance) {
@@ -43,5 +42,7 @@ public abstract class Account {
     public void deposit(double amount) { }
 
     // Withdraw money from the account
-    public void withdraw(double amount) { }
+    public boolean withdraw(double amount) {
+        return false;
+    }
 }
