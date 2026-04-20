@@ -1,5 +1,6 @@
 package org.example.Database;
 
+import java.io.IOError;
 import java.time.LocalDate;
 
 
@@ -533,7 +534,7 @@ private static Connection connect() throws Exception {
                 stmt.setNull(6, Types.VARCHAR);
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            IO.println("Error while posting log to DB: " + e.getMessage());
         }
     }
 }
