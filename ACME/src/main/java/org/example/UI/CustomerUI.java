@@ -80,9 +80,7 @@ public class CustomerUI {
             case 3 -> {
                 IO.println("creating ISA Account.");
                 acc = AccountTypePolicy.ISA;
-
                 Account a = DBinterface.createISAAccount(this.teller, customer, acc, startingMoney);
-
                 IO.println(a.toString());
             }
         }
@@ -351,7 +349,17 @@ private static boolean isInt(String input) {
 }
 
     public void createNewCustomer() {
-        throw new RuntimeException("TODO: implement this method");
+        IO.println("Please enter customer full name: ");
+        String name=sc.next();
+        sc.nextLine();
+        IO.println("!IMPORTANT");
+        IO.println("Please verify the customer's address and a valid goverment ID.");
+        IO.println("Has the customer brought both documents?[y/n]: ");
+        String input=sc.next();
+        sc.nextLine();
+        if(input.equalsIgnoreCase("y")){
+
+        }
     }
 }
 

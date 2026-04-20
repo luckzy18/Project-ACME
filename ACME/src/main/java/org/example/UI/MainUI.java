@@ -49,16 +49,15 @@ public class MainUI {
 
 
     User loginTeller(){//logs in teller
-        Scanner scanner = new Scanner(System.in);
         boolean loginSuccess = false;
 
         // Teller Login Prompt
 
         IO.println(logo);
         System.out.print("Please enter Teller ID: ");
-        String enteredTellerId = scanner.nextLine();
+        String enteredTellerId = sc.nextLine();
         System.out.print("Please enter Password: ");
-        String enteredPassword = scanner.nextLine();
+        String enteredPassword = sc.nextLine();
         User user = null;
         int count=0;
         while(count <3 && !loginSuccess){
@@ -76,9 +75,11 @@ public class MainUI {
             System.out.println("***********************************");
             IO.println("Incorrect name or password please try again.");
             System.out.print("Please enter Teller ID: ");
-            enteredTellerId = scanner.nextLine();
+            enteredTellerId = sc.next();
+            sc.nextLine();
             System.out.print("Please enter Password: ");
-            enteredPassword = scanner.nextLine();
+            enteredPassword = sc.nextLine();
+
         }
         if(!loginSuccess){
             IO.println("too many bad attempts");
@@ -91,7 +92,7 @@ public class MainUI {
         IO.println("WELCOME TO ACME BANK.");
         IO.println("What is your name?: ");
         String name=sc.nextLine();
-        boolean updateSucess=DBinterface.updateTellerName(user,name);
+        boolean updateSucess=DBinterface.updateTellerNameANDRole(user,name);
         return updateSucess;
     }
 
@@ -225,6 +226,7 @@ public class MainUI {
     private boolean deleteTeller(){
         IO.println("please insert teller ID: ");
         int ID=sc.nextInt();
+        sc.nextLine();
         User teller=DBinterface.getTeller(ID);
         IO.println(teller);
         IO.println("Are you sure you want to delete[y/n]: ");

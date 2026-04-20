@@ -479,9 +479,35 @@ private static Connection connect() throws Exception {
         return null; // Teller not found or error
     }
 
-    public static boolean updateTellerName(User user, String name) {
-    IO.println("TO DO MAKE THIS WORK AS THIS METHOD IS EMPTY.");
-    return false;
+    public static boolean updateTellerNameANDRole(User user, String name) {
+        String sql = """
+        UPDATE Teller
+        SET teller_Name = ?, 
+            teller_role = ?
+        WHERE teller_ID = ?;
+        """;
+
+        try (Connection conn = connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, name);
+            stmt.setString(2, Role.TELLER.toString());   // promote to TELLER
+            stmt.setInt(3, user.getTellerId());
+
+            int rows = stmt.executeUpdate();
+
+            if (rows > 0) {
+                // Update in-memory object too
+                user.setName(name);
+                user.setRole(Role.TELLER);
+                return true;
+            }
+
+            return false;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error updating teller name: " + e.getMessage(), e);
+        }
     }
 
     /// TIME TO WORK ON ACCOUNT CREATION, GENERATIONS WITHDRAW AND DEPOST
