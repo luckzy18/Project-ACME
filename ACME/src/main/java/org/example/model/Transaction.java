@@ -3,6 +3,10 @@ package org.example.model;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import org.example.Database.DBinterface;
+import org.example.UI.TellerUI;
+import org.example.logger.LogType;
+import org.example.logger.Logger;
 import org.example.model.Account.Account;
 
 public class Transaction {
@@ -42,10 +46,18 @@ public class Transaction {
     }
 
     //Core method
-    public boolean performTransaction(Account account) {
+    public boolean performTransaction(Account account, int tellerId) {
         if (!account.getAccountNumber().equals(this.accountNumber)) {
             this.status = TransactionStatus.FAILED;
             this.updates = "Account number doesn't match.";
+            DBinterface.postLogToDB(new Logger(
+                    LogType.WARNING,
+                    "Transaction Failed: Account Mismatch",
+                    "performTransaction",
+                    tellerId,
+                    account.getCustomerID(),
+                    this.accountNumber
+            ));
             return false;
         }
         try {
