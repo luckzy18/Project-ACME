@@ -79,6 +79,14 @@ public class Transaction {
             this.balanceAfter = account.getBalance();
             this.status = TransactionStatus.COMPLETE;
             this.updates = "Transaction successful";
+            DBinterface.postLogToDB(new Logger(
+                    LogType.INFO,
+                    this.updates + " --[" + type + "]--",
+                    "performTransaction - switchStatement",
+                    tellerId,
+                    account.getCustomerID(),
+                    this.accountNumber
+            ));
             return true;
 
         } catch (Exception e) {
@@ -90,10 +98,18 @@ public class Transaction {
     }
 
     //Transfer method
-    public boolean performTransfer(Account senderAccount, Account recipientAccount) {
+    public boolean performTransfer(Account senderAccount, Account recipientAccount, int tellerId) {
         if (senderAccount == null || recipientAccount == null) {//I don't particulary like the sender/recipient names so I'm open to suggestions.
             this.status = TransactionStatus.FAILED;
             this.updates = "Transfer invalid. Check accounts are correct.";
+            DBinterface.postLogToDB(new Logger(
+                    LogType.WARNING,
+                    "Transfer Failed: Account/s Mismatch" + "\nReason: " + this.updates,
+                    "performTransaction",
+                    tellerId,
+                    null,
+                    null
+            ));
             return false;
         }
         try {

@@ -127,7 +127,7 @@ public class CreateDB {
         }
     }
     private  static void initialiseMainTeller(){
-        String insertMainTeller="INSERT INTO Teller(teller_name,teller_Password,teller_role)" +
+        String insertMainTeller="INSERT INTO Teller(teller_name,teller_Password,teller_role) " +
                 "VALUES(?,?,?)";
         try (Connection conn = connect();
              PreparedStatement stmt = conn.prepareStatement(insertMainTeller)){
