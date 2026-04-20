@@ -166,24 +166,35 @@ public class MainUI {
             }
 
             case 5 -> {
-                IO.print("Good bye");
+                IO.print("Good bye. ");
             }
 
             // Could be worth to move the admin actions into a different class cleaning tasks
             case 6 -> {
                 IO.print("Generating new login details:");
                 String[] loginDetails = DBinterface.generateNewTeller();
+                IO.println("Please prompt the new teller to use the one time passcode and log in as quickly as possible.");
             }
 
             case 7 -> {
                 IO.print("get all tellers");
+                String[] tellers =DBinterface.getAllTellers();
+                IO.println("Tellers: ");
+                for (String teller: tellers){
+                    IO.println(teller);
+                }
                 // getAllTellers in a readable format will fetch all tellers.
                 // if you want to change the way this is displayed go into dbinterface
             }
 
             case 8 -> {
                 IO.print("delete teller");
-                deleteTeller();
+                boolean deletedTeller=deleteTeller();
+                if(deletedTeller){
+                    IO.println("Teller has been deleted.");
+                }else{
+                    IO.println("Teller has not been deleted.");
+                }
                 // deleteTellerbyID method deletes the teller if the id is inserted except for admin
             }
 
@@ -195,9 +206,16 @@ public class MainUI {
     private boolean deleteTeller(){
         IO.println("please insert teller ID: ");
         int ID=sc.nextInt();
+        User teller=DBinterface.getTeller(ID);
+        IO.println(teller);
+        IO.println("Are you sure you want to delete[y/n]: ");
+        String input=sc.nextLine();
 
-
-
+        if(input.strip().equalsIgnoreCase("y")){
+            return DBinterface.deleteTellerByID(teller.getTellerId());
+        }else{
+            return false;
+        }
 
     }
 }

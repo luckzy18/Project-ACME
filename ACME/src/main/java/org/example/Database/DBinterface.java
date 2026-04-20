@@ -2,6 +2,7 @@ package org.example.Database;
 
 import java.time.LocalDate;
 
+
 import org.example.model.Account.*;
 import org.example.model.people.Customer;
 import org.example.model.people.Role;
@@ -153,7 +154,7 @@ private static Connection connect() throws Exception {
             throw new RuntimeException(e);
         }
     }
-    public String[] getAllTellers(){
+    public static String[] getAllTellers(){
     String query="SELECT teller_ID,teller_name,teller_role FROM TELLER;";
         try(Connection conn=connect();
             PreparedStatement dstmt=conn.prepareStatement(query)){
@@ -461,6 +462,35 @@ private static Connection connect() throws Exception {
             throw new RuntimeException(e);
         }
 }
+
+    public static User getTeller(int id) {
+        String sql = """
+        SELECT teller_ID,
+               teller_Name,
+               teller_role
+        FROM Teller
+        WHERE teller_ID = ?;
+        """;
+        try (Connection conn = connect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+
+            ResultSet rs = ps.executeQuery();
+                if (rs.next()) {
+                    int tellerID = rs.getInt("teller_id");
+                    String name = rs.getString("teller_Name");
+                    String role = rs.getString("teller_role");
+
+                    return new User(tellerID, name, "", Role.valueOf(role));
+                }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null; // Teller not found or error
+    }
+
     /// TIME TO WORK ON ACCOUNT CREATION, GENERATIONS WITHDRAW AND DEPOST
     /// GETTER FOR ALL ACCOUNTS A CUSTOMER HAS AND STORED LOCALLY ONCE FETCHED
     /// THE ACCOUNTS SHOULD BE GENERATED FIRST WITHIN 3 METHODS ONE FOR EACH ACCOUNT TYPE AN OVERLOADED METHOD WOULD WORK NICELY
