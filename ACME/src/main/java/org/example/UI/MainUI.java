@@ -20,11 +20,14 @@ public class MainUI {
             """;
     private User teller;
     private CustomerUI cUI;
+    private HelpMenu helpMenu;
     Scanner sc=new Scanner(System.in);
 
-    public MainUI(){
-        this.teller=loginTeller();
-        this.cUI=new CustomerUI();
+    public MainUI() {
+        this.teller = loginTeller();
+        this.cUI = new CustomerUI();
+        this.helpMenu = new HelpMenu();
+
     }
 
     public User getTeller() {
@@ -40,7 +43,7 @@ public class MainUI {
         do{
             input=getMenuChoice(this.teller);
             performAction(input);
-        }while(input!=5);
+        }while(input!=6);
         IO.println("Shutting down");
     }
 
@@ -104,13 +107,14 @@ public class MainUI {
                                 2. Create new customer
                                 3. Remove customer
                                 4. Log out
-                                5. Exit
+                                5. Help
+                                6. Exit
                     """;
             String adminActions= """
                                     --- Admin Actions ---
-                                    6. Generate one-time login code
-                                    7. View tellers
-                                    8. Remove teller
+                                    7. Generate one-time login code
+                                    8. View tellers
+                                    9. Remove teller
                     """;
             IO.println(greet);
             IO.println(customerActions);
@@ -122,21 +126,21 @@ public class MainUI {
             while (invalidOption){
                 IO.println("\nSelect an option:");
                 if(user.isAdmin()){
-                    IO.println("1-8");
+                    IO.println("1-9");
                 }else{
-                    IO.println("1-5");
+                    IO.println("1-6");
                 }
-                Scanner sc=new Scanner(System.in);
+                ;
                 String userChoice = sc.nextLine();
 
                 try {
                     choice = Integer.parseInt(userChoice);
 
-                    if (choice >= 1 && choice <= 5 && !user.isAdmin()) {
+                    if (choice >= 1 && choice <= 6 && !user.isAdmin()) {
                         // valid input for non admin
                         System.out.println("You chose: " + choice);
                         invalidOption=false;
-                    }else if (choice >= 1 && choice <= 8){// check for admin
+                    }else if (choice >= 1 && choice <= 9 && user.isAdmin()){// check for admin
                         System.out.println("You chose: " + choice);
                         invalidOption=false;
                     }else {
@@ -181,12 +185,17 @@ public class MainUI {
                 // run the start screen again and have a goodbye message
             }
 
-            case 5 -> {
+            // help menu option
+            case 5 ->  {
+                helpMenu.showHelpMenu();
+
+            }
+            case 6 -> {
                 IO.print("Good bye. ");
             }
 
             // Could be worth to move the admin actions into a different class cleaning tasks
-            case 6 -> {
+            case 7 -> {
                 IO.print("Generating new login details:");
                 String[] loginDetails = DBinterface.generateNewTeller();
                 IO.println(String.format("New login details → Username: %s | Passcode: %s",
@@ -195,7 +204,7 @@ public class MainUI {
                 IO.println("Please prompt the new teller to use the one time passcode and log in as quickly as possible.");
             }
 
-            case 7 -> {
+            case 8 -> {
                 IO.print("get all tellers");
                 String[] tellers =DBinterface.getAllTellers();
                 IO.println("Tellers: ");
@@ -206,7 +215,7 @@ public class MainUI {
                 // if you want to change the way this is displayed go into dbinterface
             }
 
-            case 8 -> {
+            case 9 -> {
                 IO.print("delete teller");
                 boolean deletedTeller=deleteTeller();
                 if(deletedTeller){
