@@ -49,7 +49,12 @@ public class BusinessAccount extends Account {
                 ? String.format("Yes (£%.2f)", overdraft.GetMaxOverdraft())
                 : "No";
         return super.toString() + String.format(
-                " | Business Type: %s | Active Overdraft: %s",
+                """
+                Account Type   : Business
+                Business Type  : %s
+                Overdraft      : %s
+                ========================================
+                """,
                 businessType, overdraftInfo
         );
     }

@@ -36,7 +36,11 @@ public class PersonalAccount extends Account {
                 ? String.format("Yes (£%.2f)", overdraft.GetMaxOverdraft())
                 : "No";
         return super.toString() + String.format(
-                " | Active Overdraft: %s",
+                """
+                Account Type   : Personal
+                Overdraft      : %s
+                ========================================
+                """,
                 overdraftInfo
         );
     }
