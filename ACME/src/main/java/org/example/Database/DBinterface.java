@@ -543,7 +543,76 @@ private static Connection connect() throws Exception {
         }
     }
 
-    public static void withdraw(double amount, Account account) {
+    public static boolean withdraw(double amount, Account account) {
+
+        if (amount <= 0) {
+            return false;
+        }
+
+        double balance = account.getBalance();
+        double maxOverdraft = account.getOverdraft().getMaxOverdraft();
+        double overdraftUsed = account.getOverdraft().getOverdraftBalance();
+        double availableOverdraft = maxOverdraft - overdraftUsed;
+
+        double limit = balance + availableOverdraft;
+
+        if (amount > limit) {
+            throw new RuntimeException("Withdrawal exceeds available funds including overdraft.");
+        }
+
+        String updateAccountSql = """
+        UPDATE Account
+        SET balance = balance - ?
+        WHERE account_number = ?;
+        """;
+
+        String updateOverdraftSql = """
+        UPDATE Overdraft
+        SET overdraft_balance = overdraft_balance + ?
+        WHERE account_number = ?;
+        """;
+
+        try (Connection conn = connect()) {
+
+            conn.setAutoCommit(false); // Start transaction
+
+            // 1. Update account balance
+            try (PreparedStatement stmt = conn.prepareStatement(updateAccountSql)) {
+                stmt.setDouble(1, amount);
+                stmt.setString(2, account.getAccountNumber());
+                int rows = stmt.executeUpdate();
+
+                if (rows == 0) {
+                    conn.rollback();
+                    throw new RuntimeException("Withdrawal failed: account not found.");
+                }
+            }
+
+            // 2. If overdraft is needed, update overdraft table
+            if (amount > balance) {
+                double overdraftPart = amount - balance;
+
+                try (PreparedStatement stmt = conn.prepareStatement(updateOverdraftSql)) {
+                    stmt.setDouble(1, overdraftPart);
+                    stmt.setString(2, account.getAccountNumber());
+                    stmt.executeUpdate();
+                }
+            }
+
+            conn.commit();
+
+            // 3. Update in-memory object
+            account.setBalance(balance - amount);
+
+            if (amount > balance) {
+                double overdraftPart = amount - balance;
+                account.getOverdraft().setOverdraftBalance(overdraftUsed + overdraftPart);
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error during withdrawal: " + e.getMessage(), e);
+        }
+        return true;
     }
 
     /// TIME TO WORK ON ACCOUNT CREATION, GENERATIONS WITHDRAW AND DEPOST

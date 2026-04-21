@@ -29,12 +29,7 @@ public class PersonalAccount extends Account {
         this.standingOrders = standingOrders;
     }
 
-    //Methods
-    //Withdraw — overrides Account.withdraw()
-    @Override
-    public boolean withdraw(double amount) {
-        return false;
-    }
+
 
     //Add a direct debit to this account
     public void addDirectDebit(int payment) { }

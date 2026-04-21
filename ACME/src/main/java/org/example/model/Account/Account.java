@@ -54,7 +54,7 @@ public abstract class Account {
 
     // Withdraw money from the account
     public boolean withdraw(double amount) {
-        DBinterface.withdraw(amount,this);
-        return false;
+        IO.println("WITHDRAW PASSING THOROUGH ACCOUNT");
+        return DBinterface.withdraw(amount,this);
     }
 }
