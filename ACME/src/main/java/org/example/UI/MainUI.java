@@ -94,10 +94,17 @@ public class MainUI {
         }
         if(!loginSuccess){
             IO.println("too many bad attempts");
+            DBinterface.postLogToDB(new Logger(
+                    LogType.WARNING,
+                    "USER LOCKOUT: " + enteredTellerId,
+                    "Login",
+                    0,
+                    null,
+                    null
+            ));
             System.exit(0);
         }
         return user;
-
     }
 
     private boolean setUpUsername(User user) {
@@ -105,6 +112,14 @@ public class MainUI {
         IO.println("What is your name?: ");
         String name=sc.nextLine();
         boolean updateSucess=DBinterface.updateTellerName(user,name);
+        DBinterface.postLogToDB(new Logger(
+                LogType.INFO,
+                "Username updated successfully! " + name,
+                "Login",
+                0,
+                null,
+                null
+        ));
         return updateSucess;
     }
 

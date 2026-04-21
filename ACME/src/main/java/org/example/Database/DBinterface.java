@@ -4,6 +4,8 @@ import java.io.IOError;
 import java.time.LocalDate;
 
 
+import org.example.UI.TellerUI;
+import org.example.logger.LogType;
 import org.example.model.Account.*;
 import org.example.model.people.Customer;
 import org.example.model.people.Role;
@@ -94,7 +96,7 @@ private static Connection connect() throws Exception {
     return null;
     }
 
-    public static Customer getCustomerbyID(Integer id){
+    public static Customer getCustomerbyID(Integer id, User user){
         String query= "SELECT * FROM Customer WHERE customer_ID=? ;";
         Customer us=null;
 
@@ -111,6 +113,14 @@ private static Connection connect() throws Exception {
                 String date=rs.getString("customer_signup_date");
                 IO.println("customer found: "+name);
                 us=new Customer(name,id,date,addressVerified,idVerified);
+                DBinterface.postLogToDB(new Logger(
+                        LogType.INFO,
+                        "Fetch Customer: " + name,
+                        "Login",
+                        user.getTellerId(),
+                        null,
+                        null
+                ));
                 return us;
             }else {
                 IO.println("No customer found with ID: " + id);
