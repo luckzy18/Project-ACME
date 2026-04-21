@@ -258,6 +258,7 @@ private static Connection connect() throws Exception {
     IO.println("acc_number is: "+accountNumber);
     insertBankAccount(acc,accountNumber,cu.getId(),balance);
     insertBusinessACC(accountNumber,businessType);
+    insertOverdraft(accountNumber);
     return new BusinessAccount(accountNumber,cu.getId(),acc.getSortCode(),balance,businessType);
 }
 
@@ -295,6 +296,7 @@ private static Connection connect() throws Exception {
     IO.println("acc_number is: "+accountNumber);
     insertBankAccount(acc,accountNumber,cu.getId(),balance);
     insertPersonalACC(accountNumber,cu.isIdVerified());
+    insertOverdraft(accountNumber);
     return new PersonalAccount(accountNumber,cu.getId(),acc.getSortCode(),balance);
     }
 
@@ -613,6 +615,25 @@ private static Connection connect() throws Exception {
             throw new RuntimeException("Error during withdrawal: " + e.getMessage(), e);
         }
         return true;
+    }
+
+    private static boolean insertOverdraft(String accountNumber) {
+        String sql = """
+        INSERT INTO Overdraft (account_number, overdraft_balance, max_overdraft, overdraft_start)
+        VALUES (?, 0, 100, ?);
+        """;
+
+        try (Connection conn = connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, accountNumber);
+            stmt.setString(2, LocalDate.now().toString());
+
+            return stmt.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error inserting overdraft row: " + e.getMessage(), e);
+        }
     }
 
     /// TIME TO WORK ON ACCOUNT CREATION, GENERATIONS WITHDRAW AND DEPOST

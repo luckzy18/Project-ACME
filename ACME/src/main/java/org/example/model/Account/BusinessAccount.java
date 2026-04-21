@@ -22,13 +22,7 @@ public class BusinessAccount extends Account {
         return chequeBook;
     }
 
-    public boolean hasOverdraft() {
-        return overdraft;
-    }
 
-    public double getOverdraftAmount() {
-        return overdraftAmount;
-    }
 
     public boolean hasLoanRequest() {
         return loanRequest;
