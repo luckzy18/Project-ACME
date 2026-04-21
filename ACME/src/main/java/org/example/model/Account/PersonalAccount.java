@@ -1,11 +1,13 @@
-package org.example.model;
+package org.example.model.Account;
+
 public class PersonalAccount extends Account {
     //Fields
+    private Overdraft overdraft;
     private String directDebits;
     private String standingOrders; //Both strings until I confirm how we want to handle this.
 
     //Constructor matching super
-    public PersonalAccount(int accountNumber, int customerID, String sortCode, double balance) {
+    public PersonalAccount(String accountNumber, int customerID, String sortCode, double balance) {
         super(accountNumber, customerID, sortCode, balance);
     }
 
@@ -28,9 +30,26 @@ public class PersonalAccount extends Account {
     }
 
     //Methods
+    @Override
+    public String toString() {
+        String overdraftInfo = (overdraft != null)
+                ? String.format("Yes (£%.2f)", overdraft.GetMaxOverdraft())
+                : "No";
+        return super.toString() + String.format(
+                """
+                Account Type   : Personal
+                Overdraft      : %s
+                ========================================
+                """,
+                overdraftInfo
+        );
+    }
+
     //Withdraw — overrides Account.withdraw()
     @Override
-    public void withdraw(double amount) { }
+    public boolean withdraw(double amount) {
+        return false;
+    }
 
     //Add a direct debit to this account
     public void addDirectDebit(int payment) { }
@@ -44,7 +63,4 @@ public class PersonalAccount extends Account {
     //Remove a standing order by its ID
     public void removeStandingOrder(int paymentId) { }
 
-    /*
-    +Overdraft features and printing debit/order details.
-     */
 }

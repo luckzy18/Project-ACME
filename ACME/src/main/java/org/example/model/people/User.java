@@ -1,4 +1,4 @@
-package org.example.model;
+package org.example.model.people;
 
 public class User {
     private final int tellerId;
@@ -19,6 +19,9 @@ public class User {
     }
     public Role getRole() {
         return role;
+    }
+    public boolean isAdmin() {
+        return role == Role.ADMIN;
     }
     public void setPassword(String password) {
         this.password = password;

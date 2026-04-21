@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.Date;
 
 public class CreateDB {
 
@@ -16,15 +17,15 @@ public class CreateDB {
     public static void initialise() {
         String createTeller = """
                 CREATE TABLE IF NOT EXISTS Teller (
-                    teller_ID          TEXT PRIMARY KEY,
-                    teller_Name       TEXT NOT NULL,
+                    teller_ID          INTEGER PRIMARY KEY AUTOINCREMENT,
+                    teller_Name       TEXT,
                     teller_Password   TEXT NOT NULL,
                     teller_role         TEXT NOT NULL
                 );
                 """;
         String createCustomers = """
                 CREATE TABLE IF NOT EXISTS Customer (
-                    customer_ID          TEXT PRIMARY KEY,
+                    customer_ID          INTEGER PRIMARY KEY AUTOINCREMENT,
                     customer_name       TEXT NOT NULL,
                     address_verified    INTEGER NOT NULL DEFAULT 0,
                     id_verified         INTEGER NOT NULL DEFAULT 0,
@@ -33,15 +34,27 @@ public class CreateDB {
                 """;
         String createAccount = """
                 CREATE TABLE IF NOT EXISTS Account (
-                    account_Number      VARCHAR PRIMARY KEY,
-                    customer_ID     TEXT NOT NULL,
+                    account_Number      TEXT PRIMARY KEY,
+                    customer_ID     INTEGER NOT NULL,
                     sort_code       TEXT NOT NULL,
-                    balance         TEXT NOT NULL,
+                    balance         REAL NOT NULL,
                     is_active TEXT NOT NULL,
                     account_type TEXT NOT NULL,
-                    FOREIGN KEY (customer_ID) REFERENCES CUSTOMER(customer_id)
+                    FOREIGN KEY (customer_ID) REFERENCES CUSTOMER(customer_ID)
                 );
                 """;
+        String createOverdraft = """
+                CREATE TABLE IF NOT EXISTS Overdraft (
+                    account_number TEXT PRIMARY KEY,
+                    overdraft_balance REAL NOT NULL,
+                    max_overdraft REAL NOT NULL DEFAULT 100,
+                    overdraft_start TEXT,
+                    FOREIGN KEY (account_number) REFERENCES Account(account_number)
+    );
+""";
+
+
+
         String createPersonalAccount= """
                 CREATE TABLE IF NOT EXISTS PersonalACC (
                     account_Number TEXT PRIMARY KEY NOT NULL,
@@ -62,7 +75,7 @@ public class CreateDB {
                 overdraft_amount INTEGER NOT NULL,
                 overdraft boolean not null,
                 loan_request boolean not null,
-                bussiness_type TEXT NOT NULL,
+                business_type TEXT NOT NULL,
                 international_trading boolean NOT NULL,
                 FOREIGN KEY (account_number) REFERENCES Account(account_number)
                  )
@@ -84,6 +97,7 @@ public class CreateDB {
             IO.println("ISA account created");
             stmt.execute(createBusinessAccount);
             IO.println("business account created");
+            stmt.execute(createOverdraft);
             System.out.println("Tables created successfully.");
             initialiseMainTeller();
         } catch (Exception e) {
@@ -92,14 +106,14 @@ public class CreateDB {
         }
     }
     private  static void initialiseMainTeller(){
-        String insertMainTeller="INSERT INTO Teller(teller_id,teller_name,teller_Password,teller_role)" +
-                "VALUES(?,?,?,?)";
+        String insertMainTeller="INSERT INTO Teller(teller_name,teller_Password,teller_role)" +
+                "VALUES(?,?,?)";
         try (Connection conn = connect();
              PreparedStatement stmt = conn.prepareStatement(insertMainTeller)){
-             stmt.setString(1,"TO01");
-             stmt.setString(2,"ADMIN");
-            stmt.setString(3,"1234");
-            stmt.setString(4,"ADMIN");
+
+             stmt.setString(1,"ADMIN");
+            stmt.setString(2,"1234");
+            stmt.setString(3,"ADMIN");
             stmt.executeUpdate();
             IO.println("Main teller added TO01 Admin");
         }catch(Exception e){

@@ -1,11 +1,13 @@
-package org.example.model;
+package org.example.model.Account;
+
 public class ISAAccount extends Account {
     //Fields
     private double annualInterestRate;
     private double annualAverageBalance;
+    private Overdraft overdraft;
 
     //Constructor matching super
-    public ISAAccount(int accountNumber, int customerID, String sortCode, double balance) {
+    public ISAAccount(String accountNumber, int customerID, String sortCode, double balance) {
         super(accountNumber, customerID, sortCode, balance);
         this.annualInterestRate = 0.0275; //Will be changed when I better learn how ISA's work.
         this.annualAverageBalance = balance;
@@ -21,14 +23,16 @@ public class ISAAccount extends Account {
     }
 
     //Methods
-    /*
-    public double calculateInterest() {
-        return annualAverageBalance * annualInterestRate
+    @Override
+    public String toString() {
+        return super.toString() + String.format(
+                """
+                Account Type   : ISA
+                Interest Rate  : %.2f%%
+                ========================================
+                """,
+                annualInterestRate * 100
+        );
     }
-
-    //Update the stored average balance to the current balance
-    public void updateAverageBalance()
-
-     */
 
 }
