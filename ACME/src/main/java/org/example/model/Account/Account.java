@@ -36,7 +36,16 @@ public abstract class Account {
     @Override
     public String toString() {
         return String.format(
-                "Account Number: %s | Sort Code: %s | Balance: £%.2f",
+                """
+                ========================================
+                             ACCOUNT DETAILS
+                ========================================
+                Account Number : %s
+                Sort Code      : %s
+                ----------------------------------------
+                Current Balance: £%.2f
+                ========================================
+                """,
                 accountNumber, sortCode, balance
         );
     }
