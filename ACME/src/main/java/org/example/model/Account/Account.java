@@ -33,6 +33,13 @@ public abstract class Account {
     }
 
     //Methods
+    @Override
+    public String toString() {
+        return String.format(
+                "Account Number: %s | Sort Code: %s | Balance: £%.2f",
+                accountNumber, sortCode, balance
+        );
+    }
 
     public void setAccountNumber(String accountNumber) {
         this.accountNumber = accountNumber;
