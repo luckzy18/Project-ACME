@@ -29,6 +29,18 @@ public class PersonalAccount extends Account {
         this.standingOrders = standingOrders;
     }
 
+    //Methods
+    @Override
+    public String toString() {
+        String overdraftInfo = (overdraft != null)
+                ? String.format("Yes (£%.2f)", overdraft.GetMaxOverdraft())
+                : "No";
+        return super.toString() + String.format(
+                " | Active Overdraft: %s",
+                overdraftInfo
+        );
+    }
+
 
 
     //Add a direct debit to this account
