@@ -533,6 +533,7 @@ private static Connection connect() throws Exception {
             } else  {
                 stmt.setNull(6, Types.VARCHAR);
             }
+            stmt.executeUpdate();
         } catch (Exception e) {
             IO.println("Error while posting log to DB: " + e.getMessage());
         }

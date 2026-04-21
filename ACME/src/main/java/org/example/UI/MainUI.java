@@ -64,7 +64,7 @@ public class MainUI {
         while(count <3 && !loginSuccess){
             count++;
              user=DBinterface.tellerTryLogin(enteredTellerId,enteredPassword);
-            Logger
+
 
             if(user != null){
                 if(user.getRole()==Role.TEMPORARY){
