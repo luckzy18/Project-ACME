@@ -4,6 +4,8 @@ package org.example.UI;
 import java.util.Scanner;
 
 import org.example.Database.DBinterface;
+import org.example.logger.LogType;
+import org.example.logger.Logger;
 import org.example.model.people.Role;
 import org.example.model.people.User;
 import org.example.model.people.Customer;
@@ -64,7 +66,15 @@ public class MainUI {
         while(count <3 && !loginSuccess){
             count++;
              user=DBinterface.tellerTryLogin(enteredTellerId,enteredPassword);
-
+            int tellerId = Integer.parseInt(enteredTellerId.replaceAll("\\D+", ""));
+            DBinterface.postLogToDB(new Logger(
+                    LogType.WARNING,
+                    "User tried login with ID " + enteredTellerId + ". This action failed" ,
+                    "Login",
+                    tellerId,
+                    null,
+                    null
+            ));
 
             if(user != null){
                 if(user.getRole()==Role.TEMPORARY){
@@ -87,6 +97,7 @@ public class MainUI {
             System.exit(0);
         }
         return user;
+
     }
 
     private boolean setUpUsername(User user) {
