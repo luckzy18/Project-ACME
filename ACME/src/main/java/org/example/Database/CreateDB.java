@@ -92,7 +92,7 @@ public class CreateDB {
                 message TEXT NOT NULL,
                 source TEXT,
                 
-                teller_ID INTEGER NOT NULL,
+                teller_ID INTEGER,
                 customer_ID INTEGER,
                 account_number TEXT,
                 
@@ -148,6 +148,14 @@ public class CreateDB {
             stmt.setString(3,"ADMIN");
             stmt.executeUpdate();
             IO.println("Main teller added TO01 Admin");
+            DBinterface.postLogToDB(new Logger(
+                    LogType.INFO,
+                    "I created a Master Teller",
+                    "DB",
+                    1,
+                    null,
+                    null
+            ));
         }catch(Exception e){
             DBinterface.postLogToDB(new Logger(
                     LogType.ERROR,
