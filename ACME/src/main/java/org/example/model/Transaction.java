@@ -52,7 +52,8 @@ public class Transaction {
             this.updates = "Account number doesn't match.";
             DBinterface.postLogToDB(new Logger(
                     LogType.ERROR,
-                    "Transaction Failed: Account Mismatch" + "\nReason: " + this.updates,
+                    this.transactionID + " " + "Transaction Failed: Account Mismatch" + "\nReason: "
+                            + this.updates,
                     "performTransaction",
                     tellerId,
                     account.getCustomerID(),
