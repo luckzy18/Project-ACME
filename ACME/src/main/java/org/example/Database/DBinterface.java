@@ -1,5 +1,6 @@
 package org.example.Database;
 
+import java.io.IOError;
 import java.time.LocalDate;
 
 
@@ -8,6 +9,7 @@ import org.example.model.people.Customer;
 import org.example.model.people.Role;
 import org.example.model.people.User;
 import org.example.utils.Generator;
+import org.example.logger.Logger;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -511,4 +513,30 @@ private static Connection connect() throws Exception {
             throw new RuntimeException(e);
         }
     }
+    public static void postLogToDB(Logger log) {
+        String query = """
+        INSERT INTO LOGS (log_type, message, source, teller_ID, customer_ID, account_number) VALUES (?, ?, ?, ?, ?, ?)
+        """;
+        try (Connection conn = connect();
+            PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, log.getType().name());
+            stmt.setString(2, log.getMessage());
+            stmt.setString(3, log.getSource());
+            stmt.setInt(4, log.getTellerId());
+            if (log.getCustomerId() != null) {
+                stmt.setInt(5, log.getCustomerId());
+            } else {
+                stmt.setNull(5, Types.INTEGER);
+            }
+            if (log.getAccountNumber() != null) {
+                stmt.setString(6, log.getAccountNumber());
+            } else  {
+                stmt.setNull(6, Types.VARCHAR);
+            }
+        } catch (Exception e) {
+            IO.println("Error while posting log to DB: " + e.getMessage());
+        }
+    }
 }
+
+

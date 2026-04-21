@@ -176,7 +176,7 @@ public class CustomerUI {
                         IO.println("Deposit cancelled.");
                         break;}
                     Transaction t=new Transaction(Transaction.TransactionType.DEPOSIT, acc.getAccountNumber(), depositAmount,acc.getBalance());
-                    t.performTransaction(acc);
+                    t.performTransaction(acc, teller.getTellerId());
                     IO.println("Deposit successful. New balance: " + acc.getBalance());
                 }
             }
