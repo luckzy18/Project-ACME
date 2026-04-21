@@ -23,14 +23,12 @@ public class ISAAccount extends Account {
     }
 
     //Methods
-    /*
-    public double calculateInterest() {
-        return annualAverageBalance * annualInterestRate
+    @Override
+    public String toString() {
+        return super.toString() + String.format(
+                " | Interest Rate: %.2f%%",
+                annualInterestRate * 100
+        );
     }
-
-    //Update the stored average balance to the current balance
-    public void updateAverageBalance()
-
-     */
 
 }

@@ -30,6 +30,17 @@ public class PersonalAccount extends Account {
     }
 
     //Methods
+    @Override
+    public String toString() {
+        String overdraftInfo = (overdraft != null)
+                ? String.format("Yes (£%.2f)", overdraft.GetMaxOverdraft())
+                : "No";
+        return super.toString() + String.format(
+                " | Active Overdraft: %s",
+                overdraftInfo
+        );
+    }
+
     //Withdraw — overrides Account.withdraw()
     @Override
     public boolean withdraw(double amount) {
@@ -48,7 +59,4 @@ public class PersonalAccount extends Account {
     //Remove a standing order by its ID
     public void removeStandingOrder(int paymentId) { }
 
-    /*
-    +Overdraft features and printing debit/order details.
-     */
 }
