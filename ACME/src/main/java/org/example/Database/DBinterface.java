@@ -512,22 +512,48 @@ private static Connection connect() throws Exception {
         }
     }
 
+    public static void deposit(double amount, Account account) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Deposit amount must be positive.");
+        }
+
+        String sql = """
+        UPDATE Account
+        SET balance = balance + ?
+        WHERE account_number = ?;
+        """;
+
+        try (Connection conn = connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setDouble(1, amount);
+            stmt.setString(2, account.getAccountNumber());
+
+            int rows = stmt.executeUpdate();
+
+            if (rows > 0) {
+                // Update in-memory object
+                account.setBalance(account.getBalance() + amount);
+            } else {
+                throw new RuntimeException("Deposit failed: account not found.");
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error during deposit: " + e.getMessage(), e);
+        }
+    }
+
+    public static void withdraw(double amount, Account account) {
+    }
+
     /// TIME TO WORK ON ACCOUNT CREATION, GENERATIONS WITHDRAW AND DEPOST
     /// GETTER FOR ALL ACCOUNTS A CUSTOMER HAS AND STORED LOCALLY ONCE FETCHED
     /// THE ACCOUNTS SHOULD BE GENERATED FIRST WITHIN 3 METHODS ONE FOR EACH ACCOUNT TYPE AN OVERLOADED METHOD WOULD WORK NICELY
     ///  WITHDRAW AND DEPOSI CAN COME AFTER ACCOUNT CREATION
 
-    public boolean checkCustomerID(String id){
-        String query="SELECT COUNT(*) FROM Customer WHERE customer_ID=?;";
-        try (Connection conn = connect();
-             PreparedStatement stmt =conn.prepareStatement(query)){
-            stmt.setString(1,id);
-            int count=stmt.executeUpdate();
-            return count<1;
-        }catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-}
+    public boolean checkCustomerID(String id) {
+        return false;
+    }
     public boolean checkTellerID(String id) {
         String query = "SELECT COUNT(*) FROM Teller WHERE teller_id=?;";
         try (Connection conn = connect();

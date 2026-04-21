@@ -1,10 +1,16 @@
 package org.example.model.Account;
+
+import org.example.Database.DBinterface;
+
 public abstract class Account {
     //Fields
     private String accountNumber;
     private int customerID;
     private String sortCode;
     private double balance;
+
+
+
 
 
     //Constructor
@@ -34,15 +40,21 @@ public abstract class Account {
 
     //Methods
 
-    public void setAccountNumber(String accountNumber) {
-        this.accountNumber = accountNumber;
+    public void setBalance(double balance) {
+        this.balance = balance;
     }
+    public Overdraft getOverdraft(){
+       return new Overdraft(100);}
+
 
     //Deposit money into the account
-    public void deposit(double amount) { }
+    public void deposit(double amount) {
+        DBinterface.deposit(amount,this);
+    }
 
     // Withdraw money from the account
     public boolean withdraw(double amount) {
+        DBinterface.withdraw(amount,this);
         return false;
     }
 }

@@ -195,6 +195,7 @@ public class CustomerUI {
                 }
             }
 
+
             case 5 -> {
                 // Delete an account
                 IO.println("\n--- Delete Account ---");
@@ -222,8 +223,50 @@ public class CustomerUI {
     }
 
     private double getWithdrawAmount(Account acc) {
-        return 10;
+        double balance = acc.getBalance();
+        double maxOverdraft = acc.getOverdraft().getMaxOverdraft();
+        double overdraftUsed = acc.getOverdraft().getOverdraftBalance();
+
+        double availableOverdraft = maxOverdraft - overdraftUsed;
+        double limit = balance + availableOverdraft;
+
+        IO.println("\n=== Withdrawal Amount ===");
+        IO.println("Current balance: £" + balance);
+        IO.println("Available overdraft: £" + availableOverdraft);
+        IO.println("Maximum you can withdraw: £" + limit);
+        IO.println("Enter 0 to cancel withdrawal.");
+
+        Scanner sc = new Scanner(System.in);
+        double amount;
+
+        while (true) {
+            IO.print("Enter withdrawal amount: ");
+            String input = sc.nextLine().trim();
+
+            // Exit option
+            if (input.equals("0")) {
+                IO.println("Withdrawal cancelled.");
+                return 0;   // Caller can check for 0 to detect cancellation
+            }
+
+            try {
+                amount = Double.parseDouble(input);
+
+                if (amount <= 0) {
+                    IO.println("Amount must be greater than zero, or enter 0 to cancel.");
+                } else if (amount > limit) {
+                    IO.println("Amount exceeds your withdrawal limit of £" + limit);
+                } else {
+                    return amount;
+                }
+
+            } catch (NumberFormatException e) {
+                IO.println("Invalid input. Please enter a valid number.");
+            }
+        }
     }
+
+
 
 
     public int promptCustomerID() {
