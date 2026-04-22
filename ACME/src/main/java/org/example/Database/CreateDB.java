@@ -222,7 +222,8 @@ public class CreateDB {
             stmt.setString(2,"1234");
             stmt.setString(3,"ADMIN");
             stmt.executeUpdate();
-            IO.println("Main teller added TO01 Admin");
+            IO.println("Main teller added");
+            IO.println("Login with ID: "+"1"+" password: "+"1234");
             DBinterface.postLogToDB(new Logger(
                     LogType.INFO,
                     "I created a Master Teller",

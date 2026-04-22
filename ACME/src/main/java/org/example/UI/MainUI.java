@@ -115,7 +115,7 @@ public class MainUI {
         IO.println("WELCOME TO ACME BANK.");
         IO.println("What is your name?: ");
         String name=sc.nextLine();
-        boolean updateSucess=DBinterface.updateTellerName(user,name);
+        boolean updateSucess=DBinterface.updateTellerNameANDRole(user,name);
         DBinterface.postLogToDB(new Logger(
                 LogType.INFO,
                 "Username updated successfully! " + name,
