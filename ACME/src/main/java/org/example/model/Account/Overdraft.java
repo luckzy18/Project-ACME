@@ -4,13 +4,13 @@ import java.util.Date;
 
 public class Overdraft {
     private double overdraftBalance = 0;
-    private double maxOverdraft = 100;
+    private int maxOverdraft = 100;
     private Date overdraftStart;
     private static final double MONTHLY_INTEREST_RATE = 0.015; // 1.5%
 
     public Overdraft() {}
 
-    public Overdraft(double maxOverdraft) {
+    public Overdraft(int maxOverdraft) {
         this.maxOverdraft = maxOverdraft;
     }
 
@@ -33,5 +33,9 @@ public class Overdraft {
             return Math.abs(overdraftBalance) * MONTHLY_INTEREST_RATE;
         }
         return 0;
+    }
+
+    public int GetMaxOverdraft() {
+        return maxOverdraft;
     }
 }

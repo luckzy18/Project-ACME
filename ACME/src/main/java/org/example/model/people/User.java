@@ -2,9 +2,19 @@ package org.example.model.people;
 
 public class User {
     private final int tellerId;
-    private final String name;
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    private String name;
     private String password;
-    private final Role role;
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    private  Role role;
     public User(int tellerId, String name, String password, Role role) {
         this.tellerId = tellerId;
         this.name = name;
@@ -17,6 +27,7 @@ public class User {
     public String getName() {
         return name;
     }
+
     public Role getRole() {
         return role;
     }

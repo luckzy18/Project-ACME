@@ -45,11 +45,7 @@ public class PersonalAccount extends Account {
         );
     }
 
-    //Withdraw — overrides Account.withdraw()
-    @Override
-    public boolean withdraw(double amount) {
-        return false;
-    }
+
 
     //Add a direct debit to this account
     public void addDirectDebit(int payment) { }
@@ -63,4 +59,7 @@ public class PersonalAccount extends Account {
     //Remove a standing order by its ID
     public void removeStandingOrder(int paymentId) { }
 
+    /*
+    +Overdraft features and printing debit/order details.
+     */
 }

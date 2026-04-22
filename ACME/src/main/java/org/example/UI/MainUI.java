@@ -51,16 +51,15 @@ public class MainUI {
 
 
     User loginTeller(){//logs in teller
-        Scanner scanner = new Scanner(System.in);
         boolean loginSuccess = false;
 
         // Teller Login Prompt
 
         IO.println(logo);
         System.out.print("Please enter Teller ID: ");
-        String enteredTellerId = scanner.nextLine();
+        String enteredTellerId = sc.nextLine();
         System.out.print("Please enter Password: ");
-        String enteredPassword = scanner.nextLine();
+        String enteredPassword = sc.nextLine();
         User user = null;
         int count=0;
         while(count <3 && !loginSuccess){
@@ -88,9 +87,11 @@ public class MainUI {
             System.out.println("***********************************");
             IO.println("Incorrect name or password please try again.");
             System.out.print("Please enter Teller ID: ");
-            enteredTellerId = scanner.nextLine();
+            enteredTellerId = sc.next();
+            sc.nextLine();
             System.out.print("Please enter Password: ");
-            enteredPassword = scanner.nextLine();
+            enteredPassword = sc.nextLine();
+
         }
         if(!loginSuccess){
             IO.println("too many bad attempts");
@@ -194,7 +195,12 @@ public class MainUI {
 
                 // getCustomerbyID information retrieved is only about the customer account nothing about bank accounts
                 IO.print("inserting Customer ");
-                cUI.createNewCustomer();
+                Customer c=cUI.createNewCustomer();
+                if(c!=null){
+                    IO.println(c);
+                }else{
+                    IO.println("We could not create an account at this time.");
+                }
                 // insertCustomer gets an id back which is required for users to log in.
             }
 
@@ -253,6 +259,7 @@ public class MainUI {
     private boolean deleteTeller(){
         IO.println("please insert teller ID: ");
         int ID=sc.nextInt();
+        sc.nextLine();
         User teller=DBinterface.getTeller(ID);
         IO.println(teller);
         IO.println("Are you sure you want to delete[y/n]: ");
