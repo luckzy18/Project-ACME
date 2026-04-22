@@ -212,6 +212,11 @@ public class CustomerUI {
             }
 
             case 6 -> {
+                // direct debits transfers and standing orders.
+                IO.println("Returning to previous menu.");
+            }
+
+            case 7 -> {
                 // Back to previous menu
                 IO.println("Returning to previous menu.");
             }
