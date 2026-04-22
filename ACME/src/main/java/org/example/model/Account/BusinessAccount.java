@@ -22,7 +22,13 @@ public class BusinessAccount extends Account {
         return chequeBook;
     }
 
+    public boolean hasOverdraft() {
+        return overdraft.isInOverdraft();
+    }
 
+    public double getOverdraftAmount() {
+        return overdraft.getOverdraftBalance();
+    }
 
     public boolean hasLoanRequest() {
         return loanRequest;
@@ -40,10 +46,15 @@ public class BusinessAccount extends Account {
     @Override
     public String toString() {
         String overdraftInfo = (overdraft != null)
-                ? String.format("Yes (£%.2f)", overdraft.GetMaxOverdraft())
+                ? String.format("Yes (£%.2f)", overdraft.getMaxOverdraft())
                 : "No";
         return super.toString() + String.format(
-                " | Business Type: %s | Active Overdraft: %s",
+                """
+                Account Type   : Business
+                Business Type  : %s
+                Overdraft      : %s
+                ========================================
+                """,
                 businessType, overdraftInfo
         );
     }

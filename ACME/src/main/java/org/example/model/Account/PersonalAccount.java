@@ -33,10 +33,14 @@ public class PersonalAccount extends Account {
     @Override
     public String toString() {
         String overdraftInfo = (overdraft != null)
-                ? String.format("Yes (£%.2f)", overdraft.GetMaxOverdraft())
+                ? String.format("Yes (£%.2f)", overdraft.getMaxOverdraft())
                 : "No";
         return super.toString() + String.format(
-                " | Active Overdraft: %s",
+                """
+                Account Type   : Personal
+                Overdraft      : %s
+                ========================================
+                """,
                 overdraftInfo
         );
     }

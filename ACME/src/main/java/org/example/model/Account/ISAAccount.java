@@ -26,7 +26,11 @@ public class ISAAccount extends Account {
     @Override
     public String toString() {
         return super.toString() + String.format(
-                " | Interest Rate: %.2f%%",
+                """
+                Account Type   : ISA
+                Interest Rate  : %.2f%%
+                ========================================
+                """,
                 annualInterestRate * 100
         );
     }
