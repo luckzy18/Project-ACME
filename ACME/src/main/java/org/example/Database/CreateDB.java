@@ -1,5 +1,8 @@
 package org.example.Database;
 
+import org.example.logger.LogType;
+import org.example.logger.Logger;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -89,7 +92,7 @@ public class CreateDB {
                 message TEXT NOT NULL,
                 source TEXT,
                 
-                teller_ID INTEGER NOT NULL,
+                teller_ID INTEGER,
                 customer_ID INTEGER,
                 account_number TEXT,
                 
@@ -121,6 +124,14 @@ public class CreateDB {
             IO.println("logging table created");
             System.out.println("Tables created successfully.");
             initialiseMainTeller();
+            DBinterface.postLogToDB(new Logger(
+                    LogType.INFO,
+                    "I created myself",
+                    "DB",
+                    0,
+                    null,
+                    null
+            ));
         } catch (Exception e) {
             System.out.println("Error creating tables: " + e.getMessage());
             e.printStackTrace();
@@ -132,13 +143,28 @@ public class CreateDB {
         try (Connection conn = connect();
              PreparedStatement stmt = conn.prepareStatement(insertMainTeller)){
 
-             stmt.setString(1,"ADMIN");
+            stmt.setString(1,"ADMIN");
             stmt.setString(2,"1234");
             stmt.setString(3,"ADMIN");
             stmt.executeUpdate();
             IO.println("Main teller added TO01 Admin");
+            DBinterface.postLogToDB(new Logger(
+                    LogType.INFO,
+                    "I created a Master Teller",
+                    "DB",
+                    1,
+                    null,
+                    null
+            ));
         }catch(Exception e){
-            e.printStackTrace();
+            DBinterface.postLogToDB(new Logger(
+                    LogType.ERROR,
+                    "I cant connect to myself to create a Teller",
+                    "DB",
+                    0,
+                    null,
+                    null
+            ));
         }
 
     }

@@ -38,7 +38,7 @@ public class CustomerUI {
             //prompt to get id details should add a break to come out
             // a return statement would work better to exit
             IO.println("finding customer");
-            cust= DBinterface.getCustomerbyID(customerId);
+            cust= DBinterface.getCustomerbyID(customerId, this.teller);
         }while(cust==null);
         setCustomer(cust);
         int actionInput;
@@ -336,7 +336,7 @@ private Customer searchForCustomer(){
         IO.println("Please enter a customer ID: ");
     }
     int inp=Integer.parseInt(input);
-    Customer cust=DBinterface.getCustomerbyID(inp);
+    Customer cust=DBinterface.getCustomerbyID(inp, this.teller);
 
 
     return cust;

@@ -4,6 +4,8 @@ package org.example.UI;
 import java.util.Scanner;
 
 import org.example.Database.DBinterface;
+import org.example.logger.LogType;
+import org.example.logger.Logger;
 import org.example.model.people.Role;
 import org.example.model.people.User;
 import org.example.model.people.Customer;
@@ -64,6 +66,15 @@ public class MainUI {
         while(count <3 && !loginSuccess){
             count++;
              user=DBinterface.tellerTryLogin(enteredTellerId,enteredPassword);
+            int tellerId = Integer.parseInt(enteredTellerId.replaceAll("\\D+", ""));
+            DBinterface.postLogToDB(new Logger(
+                    LogType.WARNING,
+                    "User tried login with ID " + enteredTellerId + ". This action failed" ,
+                    "Login",
+                    tellerId,
+                    null,
+                    null
+            ));
 
             if(user != null){
                 if(user.getRole()==Role.TEMPORARY){
@@ -83,6 +94,14 @@ public class MainUI {
         }
         if(!loginSuccess){
             IO.println("too many bad attempts");
+            DBinterface.postLogToDB(new Logger(
+                    LogType.WARNING,
+                    "USER LOCKOUT: " + enteredTellerId,
+                    "Login",
+                    0,
+                    null,
+                    null
+            ));
             System.exit(0);
         }
         return user;
@@ -93,6 +112,14 @@ public class MainUI {
         IO.println("What is your name?: ");
         String name=sc.nextLine();
         boolean updateSucess=DBinterface.updateTellerName(user,name);
+        DBinterface.postLogToDB(new Logger(
+                LogType.INFO,
+                "Username updated successfully! " + name,
+                "Login",
+                0,
+                null,
+                null
+        ));
         return updateSucess;
     }
 
