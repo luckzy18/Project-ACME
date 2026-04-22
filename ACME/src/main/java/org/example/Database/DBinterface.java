@@ -647,6 +647,214 @@ private static Connection connect() throws Exception {
             throw new RuntimeException("Error inserting overdraft row: " + e.getMessage(), e);
         }
     }
+    public static boolean insertPaymentHistory(String accountNumber, String type,
+                                               double amount, String reference) {
+
+        String sql = """
+        INSERT INTO PaymentHistory (account_number, type, amount, date, reference)
+        VALUES (?, ?, ?, ?, ?);
+        """;
+
+        try (Connection conn = connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, accountNumber);
+            stmt.setString(2, type);
+            stmt.setDouble(3, amount);
+            stmt.setString(4, LocalDate.now().toString());
+            stmt.setString(5, reference);
+
+            return stmt.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error inserting payment history: " + e.getMessage(), e);
+        }
+    }
+
+    public static boolean insertStandingOrder(String fromAcc, String toAcc, double amount,
+                                              String frequency, String nextPaymentDate, String reference) {
+
+        String sql = """
+        INSERT INTO StandingOrder (from_account, to_account, amount, frequency, next_payment_date, active, reference)
+        VALUES (?, ?, ?, ?, ?, 1, ?);
+        """;
+
+        try (Connection conn = connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, fromAcc);
+            stmt.setString(2, toAcc);
+            stmt.setDouble(3, amount);
+            stmt.setString(4, frequency);
+            stmt.setString(5, nextPaymentDate);
+            stmt.setString(6, reference);
+
+            return stmt.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error inserting standing order: " + e.getMessage(), e);
+        }
+    }
+    public static boolean insertDirectDebit(String accountNumber, String merchant, double amount,
+                                            String frequency, String nextPaymentDate) {
+
+        String sql = """
+        INSERT INTO DirectDebit (account_number, merchant_name, amount, frequency, next_payment_date, active)
+        VALUES (?, ?, ?, ?, ?, 1);
+        """;
+
+        try (Connection conn = connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, accountNumber);
+            stmt.setString(2, merchant);
+            stmt.setDouble(3, amount);
+            stmt.setString(4, frequency);
+            stmt.setString(5, nextPaymentDate);
+
+            return stmt.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error inserting direct debit: " + e.getMessage(), e);
+        }
+    }
+    public static boolean insertTransfer(String fromAcc, String toAcc, double amount, String reference) {
+        String sql = """
+        INSERT INTO Transfer (from_account, to_account, amount, transfer_date, reference, status)
+        VALUES (?, ?, ?, ?, ?, 'COMPLETED');
+        """;
+
+        try (Connection conn = connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, fromAcc);
+            stmt.setString(2, toAcc);
+            stmt.setDouble(3, amount);
+            stmt.setString(4, LocalDate.now().toString());
+            stmt.setString(5, reference);
+
+            return stmt.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error inserting transfer: " + e.getMessage(), e);
+        }
+    }
+    public static List<String> getTransactionsForAccount(String accountNumber) {
+        List<String> list = new ArrayList<>();
+
+        String qTransfer = """
+        SELECT transfer_date, amount, from_account, to_account, reference
+        FROM Transfer
+        WHERE from_account = ? OR to_account = ?
+        ORDER BY transfer_date DESC;
+        """;
+
+        String qDirectDebit = """
+        SELECT next_payment_date, merchant_name, amount, frequency
+        FROM DirectDebit
+        WHERE account_number = ?
+        ORDER BY next_payment_date DESC;
+        """;
+
+        String qStandingOrder = """
+        SELECT next_payment_date, from_account, to_account, amount, frequency, reference
+        FROM StandingOrder
+        WHERE from_account = ?
+        ORDER BY next_payment_date DESC;
+        """;
+
+        try (Connection conn = connect()) {
+
+            // Transfers
+            try (PreparedStatement stmt = conn.prepareStatement(qTransfer)) {
+                stmt.setString(1, accountNumber);
+                stmt.setString(2, accountNumber);
+                ResultSet rs = stmt.executeQuery();
+
+                while (rs.next()) {
+                    String line = "TRANSFER | Date: " + rs.getString("transfer_date") +
+                            " | Amount: £" + rs.getDouble("amount") +
+                            " | From: " + rs.getString("from_account") +
+                            " | To: " + rs.getString("to_account") +
+                            " | Ref: " + rs.getString("reference");
+                    list.add(line);
+                }
+            }
+
+            // Direct Debits
+            try (PreparedStatement stmt = conn.prepareStatement(qDirectDebit)) {
+                stmt.setString(1, accountNumber);
+                ResultSet rs = stmt.executeQuery();
+
+                while (rs.next()) {
+                    String line = "DIRECT DEBIT | Merchant: " + rs.getString("merchant_name") +
+                            " | Amount: £" + rs.getDouble("amount") +
+                            " | Frequency: " + rs.getString("frequency") +
+                            " | Next: " + rs.getString("next_payment_date");
+                    list.add(line);
+                }
+            }
+
+            // Standing Orders
+            try (PreparedStatement stmt = conn.prepareStatement(qStandingOrder)) {
+                stmt.setString(1, accountNumber);
+                ResultSet rs = stmt.executeQuery();
+
+                while (rs.next()) {
+                    String line = "STANDING ORDER | Amount: £" + rs.getDouble("amount") +
+                            " | To: " + rs.getString("to_account") +
+                            " | Frequency: " + rs.getString("frequency") +
+                            " | Next: " + rs.getString("next_payment_date") +
+                            " | Ref: " + rs.getString("reference");
+                    list.add(line);
+                }
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error fetching transactions: " + e.getMessage(), e);
+        }
+
+        return list;
+    }
+    public static boolean cancelStandingOrder(int soId) {
+        String sql = """
+        UPDATE StandingOrder
+        SET active = 0
+        WHERE so_id = ?;
+        """;
+
+        try (Connection conn = connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, soId);
+            return stmt.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error cancelling standing order: " + e.getMessage(), e);
+        }
+    }
+
+    public static boolean cancelDirectDebit(int ddId) {
+        String sql = """
+        UPDATE DirectDebit
+        SET active = 0
+        WHERE dd_id = ?;
+        """;
+
+        try (Connection conn = connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, ddId);
+            return stmt.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error cancelling direct debit: " + e.getMessage(), e);
+        }
+    }
+
+
+
+
 
     /// TIME TO WORK ON ACCOUNT CREATION, GENERATIONS WITHDRAW AND DEPOST
     /// GETTER FOR ALL ACCOUNTS A CUSTOMER HAS AND STORED LOCALLY ONCE FETCHED

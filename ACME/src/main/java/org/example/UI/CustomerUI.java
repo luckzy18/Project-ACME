@@ -212,11 +212,31 @@ public class CustomerUI {
             }
 
             case 6 -> {
-                // direct debits transfers and standing orders.
-                IO.println("Returning to previous menu.");
-            }
+                IO.println("\n=== Payment Options ===");
+                IO.println("1. Create Transfer");
+                IO.println("2. Create Direct Debit");
+                IO.println("3. Create Standing Order");
+                IO.println("0. Return to previous menu");
 
+                IO.print("Choose an option: ");
+                String choice = sc.nextLine().trim();
+
+                switch (choice) {
+                    case "1" -> createTransferUI(customer);
+                    case "2" -> createDirectDebitUI(customer);
+                    case "3" -> createStandingOrderUI(customer);
+                    case "4" -> cancelStandingOrderUI();
+                    case "5" -> cancelDirectDebitUI();
+                    case "0" -> IO.println("Returning to previous menu.");
+                    default -> IO.println("Invalid option.");
+                }
+            }
             case 7 -> {
+                Account acc = promptSelectAccount();
+                if (acc != null) {
+                    showTransactionsUI(acc);
+                }
+            }case 8 -> {
                 // Back to previous menu
                 IO.println("Returning to previous menu.");
             }
@@ -227,6 +247,103 @@ public class CustomerUI {
         }
     }
 
+    private void createStandingOrderUI(Customer customer) {
+        IO.println("\n=== Create Standing Order ===");
+
+        // Select FROM account
+        Account fromAcc = promptSelectAccount();
+        if (fromAcc == null) {
+            IO.println("Standing order creation cancelled.");
+            return;
+        }
+
+        String from = fromAcc.getAccountNumber();
+
+        // Enter TO account
+        IO.print("To account number: ");
+        String to = sc.nextLine().trim();
+
+        // Amount (reuse withdraw-limit logic)
+        IO.println("Enter standing order amount:");
+        double amount = getWithdrawAmount(fromAcc);
+        if (amount <= 0) {
+            IO.println("Standing order cancelled.");
+            return;
+        }
+
+        // Frequency
+        IO.print("Frequency (monthly/weekly/yearly): ");
+        String freq = sc.nextLine().trim();
+
+        // First payment date
+        IO.print("First payment date (YYYY-MM-DD): ");
+        String date = sc.nextLine().trim();
+
+        // Reference
+        IO.print("Reference: ");
+        String ref = sc.nextLine().trim();
+
+        boolean ok = DBinterface.insertStandingOrder(from, to, amount, freq, date, ref);
+
+        if (ok) IO.println("Standing order created successfully.");
+        else IO.println("Failed to create standing order.");
+    }
+
+    private void createDirectDebitUI(Customer customer) {
+        IO.println("\n=== Create Direct Debit ===");
+
+        // Select account to charge
+        Account acc = promptSelectAccount();
+        if (acc == null) {
+            IO.println("Direct debit creation cancelled.");
+            return;
+        }
+
+        String accountNumber = acc.getAccountNumber();
+
+        // Merchant
+        IO.print("Merchant name: ");
+        String merchant = sc.nextLine().trim();
+
+        // Amount (reuse withdraw-limit logic)
+        IO.println("Enter direct debit amount:");
+        double amount = getWithdrawAmount(acc);
+        if (amount <= 0) {
+            IO.println("Direct debit cancelled.");
+            return;
+        }
+
+        // Frequency
+        IO.print("Frequency (monthly/weekly/yearly): ");
+        String freq = sc.nextLine().trim();
+
+        // First payment date
+        IO.print("First payment date (YYYY-MM-DD): ");
+        String date = sc.nextLine().trim();
+
+        boolean ok = DBinterface.insertDirectDebit(accountNumber, merchant, amount, freq, date);
+
+        if (ok) IO.println("Direct debit created successfully.");
+        else IO.println("Failed to create direct debit.");
+    }
+
+    private void showTransactionsUI(Account acc) {
+        IO.println("\n=== Transaction History for Account " + acc.getAccountNumber() + " ===");
+
+        List<String> tx = DBinterface.getTransactionsForAccount(acc.getAccountNumber());
+
+        if (tx.isEmpty()) {
+            IO.println("No transactions found for this account.");
+            return;
+        }
+
+        for (String line : tx) {
+            IO.println(line);
+        }
+    }
+
+
+
     private double getWithdrawAmount(Account acc) {
         double balance = acc.getBalance();
         double maxOverdraft = acc.getOverdraft().getMaxOverdraft();
@@ -235,22 +352,22 @@ public class CustomerUI {
         double availableOverdraft = maxOverdraft - overdraftUsed;
         double limit = balance + availableOverdraft;
 
-        IO.println("\n=== Withdrawal Amount ===");
+        IO.println("\n===  Amount ===");
         IO.println("Current balance: £" + balance);
         IO.println("Available overdraft: £" + availableOverdraft);
-        IO.println("Maximum you can withdraw: £" + limit);
+        IO.println("Funds limit: £" + limit);
         IO.println("Enter 0 to cancel withdrawal.");
 
         Scanner sc = new Scanner(System.in);
         double amount;
 
         while (true) {
-            IO.print("Enter withdrawal amount: ");
+            IO.print("Enter amount: ");
             String input = sc.nextLine().trim();
 
             // Exit option
             if (input.equals("0")) {
-                IO.println("Withdrawal cancelled.");
+                IO.println(" cancelled.");
                 return 0;   // Caller can check for 0 to detect cancellation
             }
 
@@ -260,7 +377,7 @@ public class CustomerUI {
                 if (amount <= 0) {
                     IO.println("Amount must be greater than zero, or enter 0 to cancel.");
                 } else if (amount > limit) {
-                    IO.println("Amount exceeds your withdrawal limit of £" + limit);
+                    IO.println("Amount exceeds your  limit of £" + limit);
                 } else {
                     return amount;
                 }
@@ -341,7 +458,9 @@ public class CustomerUI {
             3. Deposit into an account
             4. Withdraw from an account
             5. Delete an account
-            6. Back to main menu
+            6. Transfers/standing orders/Direct debits
+            7.View account
+            8.Back to main menu
             """;
 
         IO.println(header);
@@ -351,17 +470,17 @@ public class CustomerUI {
         boolean invalid = true;
 
         while (invalid) {
-            IO.println("Select an option (1-7):");
+            IO.println("Select an option (1-8):");
             String input = sc.nextLine();
 
             try {
                 choice = Integer.parseInt(input);
 
-                if (choice >= 1 && choice <= 7) {
+                if (choice >= 1 && choice <= 8) {
                     IO.println("You chose: " + choice);
                     invalid = false;
                 } else {
-                    IO.println("Invalid option. Please choose between 1 and 7.");
+                    IO.println("Invalid option. Please choose between 1 and 8.");
                 }
 
             } catch (NumberFormatException e) {
@@ -410,6 +529,111 @@ private static boolean isInt(String input) {
         }
         return null;
     }
+    private void createTransferUI(Customer cu) {
+        IO.println("\n=== Create Transfer ===");
+
+        IO.print("From account number: ");
+
+        Account acc = promptSelectAccount();
+        if(acc==null){
+            IO.println("transfer cancelled.");
+            return;
+        }
+        String from=acc.getAccountNumber();
+
+        IO.print("To account number: ");// need to make sure it's the right lenght
+        String to = sc.nextLine().trim();
+
+        IO.print("Amount: ");
+        double amount = getWithdrawAmount(acc);
+
+        IO.print("Reference: ");
+        String ref = sc.nextLine().trim();
+
+        boolean ok = DBinterface.insertTransfer(from, to, amount, ref);
+
+        if (ok) IO.println("Transfer created successfully.");
+        else IO.println("Failed to create transfer.");
+    }
+    private void cancelStandingOrderUI() {
+        IO.println("\n=== Cancel Standing Order ===");
+
+        while (true) {
+            IO.print("Enter Standing Order ID to cancel (0 to exit): ");
+            String input = sc.nextLine().trim();
+
+            // Cancel option
+            if (input.equals("0")) {
+                IO.println("Cancellation aborted.");
+                return;
+            }
+
+            // Validate integer
+            int soId;
+            try {
+                soId = Integer.parseInt(input);
+                if (soId < 0) {
+                    IO.println("ID cannot be negative. Try again.");
+                    continue;
+                }
+            } catch (NumberFormatException e) {
+                IO.println("Invalid input. Please enter a valid numeric ID.");
+                continue;
+            }
+
+            // Attempt cancellation
+            boolean ok = DBinterface.cancelStandingOrder(soId);
+
+            if (ok) {
+                IO.println("Standing order cancelled successfully.");
+            } else {
+                IO.println("No standing order found with that ID or cancellation failed.");
+            }
+
+            return;
+        }
+    }
+    private void cancelDirectDebitUI() {
+        IO.println("\n=== Cancel Direct Debit ===");
+
+        while (true) {
+            IO.print("Enter Direct Debit ID to cancel (0 to exit): ");
+            String input = sc.nextLine().trim();
+
+            // Cancel option
+            if (input.equals("0")) {
+                IO.println("Cancellation aborted.");
+                return;
+            }
+
+            // Validate integer
+            int ddId;
+            try {
+                ddId = Integer.parseInt(input);
+                if (ddId < 0) {
+                    IO.println("ID cannot be negative. Try again.");
+                    continue;
+                }
+            } catch (NumberFormatException e) {
+                IO.println("Invalid input. Please enter a valid numeric ID.");
+                continue;
+            }
+
+            // Attempt cancellation
+            boolean ok = DBinterface.cancelDirectDebit(ddId);
+
+            if (ok) {
+                IO.println("Direct debit cancelled successfully.");
+            } else {
+                IO.println("No direct debit found with that ID or cancellation failed.");
+            }
+
+            return;
+        }
+    }
+
+
+
 }
 
 
