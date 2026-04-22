@@ -1,13 +1,17 @@
 package org.example.Database;
 
+import java.io.IOError;
 import java.time.LocalDate;
 
 
+import org.example.UI.TellerUI;
+import org.example.logger.LogType;
 import org.example.model.Account.*;
 import org.example.model.people.Customer;
 import org.example.model.people.Role;
 import org.example.model.people.User;
 import org.example.utils.Generator;
+import org.example.logger.Logger;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -70,21 +74,23 @@ private static Connection connect() throws Exception {
 
 }
 
-    public static Integer  insertCustomer (String name,boolean addressVerfied,boolean identityVerified){
+    public static Customer  insertCustomer (String name,boolean addressVerfied,boolean identityVerified){
     String insertCustomer="Insert into Customer(customer_name,address_verified,id_verified,customer_signup_date)" +
             " Values(?,?,?,?)";
+    String date=LocalDate.now().toString();
     try (Connection conn = connect();
          PreparedStatement stmt = conn.prepareStatement(insertCustomer, Statement.RETURN_GENERATED_KEYS);){
          stmt.setString(1,name);
          stmt.setBoolean(2,addressVerfied);
          stmt.setBoolean(3,identityVerified);
-         stmt.setString(4, LocalDate.now().toString());
+         stmt.setString(4, date);
 
          stmt.executeUpdate();
 
          ResultSet rs=stmt.getGeneratedKeys();
          if(rs.next()){
-             return rs.getInt(1);
+             return new Customer(name,rs.getInt(1),date,true,true);
+
          }
     }catch(Exception e){
         e.printStackTrace();
@@ -92,7 +98,7 @@ private static Connection connect() throws Exception {
     return null;
     }
 
-    public static Customer getCustomerbyID(Integer id){
+    public static Customer getCustomerbyID(Integer id, User user){
         String query= "SELECT * FROM Customer WHERE customer_ID=? ;";
         Customer us=null;
 
@@ -109,6 +115,14 @@ private static Connection connect() throws Exception {
                 String date=rs.getString("customer_signup_date");
                 IO.println("customer found: "+name);
                 us=new Customer(name,id,date,addressVerified,idVerified);
+                DBinterface.postLogToDB(new Logger(
+                        LogType.INFO,
+                        "Fetch Customer: " + name,
+                        "Login",
+                        user.getTellerId(),
+                        null,
+                        null
+                ));
                 return us;
             }else {
                 IO.println("No customer found with ID: " + id);
@@ -256,6 +270,7 @@ private static Connection connect() throws Exception {
     IO.println("acc_number is: "+accountNumber);
     insertBankAccount(acc,accountNumber,cu.getId(),balance);
     insertBusinessACC(accountNumber,businessType);
+    insertOverdraft(accountNumber);
     return new BusinessAccount(accountNumber,cu.getId(),acc.getSortCode(),balance,businessType);
 }
 
@@ -293,6 +308,7 @@ private static Connection connect() throws Exception {
     IO.println("acc_number is: "+accountNumber);
     insertBankAccount(acc,accountNumber,cu.getId(),balance);
     insertPersonalACC(accountNumber,cu.isIdVerified());
+    insertOverdraft(accountNumber);
     return new PersonalAccount(accountNumber,cu.getId(),acc.getSortCode(),balance);
     }
 
@@ -479,9 +495,157 @@ private static Connection connect() throws Exception {
         return null; // Teller not found or error
     }
 
-    public static boolean updateTellerName(User user, String name) {
-    IO.println("TO DO MAKE THIS WORK AS THIS METHOD IS EMPTY.");
-    return false;
+    public static boolean updateTellerNameANDRole(User user, String name) {
+        String sql = """
+        UPDATE Teller
+        SET teller_Name = ?, 
+            teller_role = ?
+        WHERE teller_ID = ?;
+        """;
+
+        try (Connection conn = connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, name);
+            stmt.setString(2, Role.TELLER.toString());   // promote to TELLER
+            stmt.setInt(3, user.getTellerId());
+
+            int rows = stmt.executeUpdate();
+
+            if (rows > 0) {
+                // Update in-memory object too
+                user.setName(name);
+                user.setRole(Role.TELLER);
+                return true;
+            }
+
+            return false;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error updating teller name: " + e.getMessage(), e);
+        }
+    }
+
+    public static void deposit(double amount, Account account) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Deposit amount must be positive.");
+        }
+
+        String sql = """
+        UPDATE Account
+        SET balance = balance + ?
+        WHERE account_number = ?;
+        """;
+
+        try (Connection conn = connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setDouble(1, amount);
+            stmt.setString(2, account.getAccountNumber());
+
+            int rows = stmt.executeUpdate();
+
+            if (rows > 0) {
+                // Update in-memory object
+                account.setBalance(account.getBalance() + amount);
+            } else {
+                throw new RuntimeException("Deposit failed: account not found.");
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error during deposit: " + e.getMessage(), e);
+        }
+    }
+
+    public static boolean withdraw(double amount, Account account) {
+
+        if (amount <= 0) {
+            return false;
+        }
+
+        double balance = account.getBalance();
+        double maxOverdraft = account.getOverdraft().getMaxOverdraft();
+        double overdraftUsed = account.getOverdraft().getOverdraftBalance();
+        double availableOverdraft = maxOverdraft - overdraftUsed;
+
+        double limit = balance + availableOverdraft;
+
+        if (amount > limit) {
+            throw new RuntimeException("Withdrawal exceeds available funds including overdraft.");
+        }
+
+        String updateAccountSql = """
+        UPDATE Account
+        SET balance = balance - ?
+        WHERE account_number = ?;
+        """;
+
+        String updateOverdraftSql = """
+        UPDATE Overdraft
+        SET overdraft_balance = overdraft_balance + ?
+        WHERE account_number = ?;
+        """;
+
+        try (Connection conn = connect()) {
+
+            conn.setAutoCommit(false); // Start transaction
+
+            // 1. Update account balance
+            try (PreparedStatement stmt = conn.prepareStatement(updateAccountSql)) {
+                stmt.setDouble(1, amount);
+                stmt.setString(2, account.getAccountNumber());
+                int rows = stmt.executeUpdate();
+
+                if (rows == 0) {
+                    conn.rollback();
+                    throw new RuntimeException("Withdrawal failed: account not found.");
+                }
+            }
+
+            // 2. If overdraft is needed, update overdraft table
+            if (amount > balance) {
+                double overdraftPart = amount - balance;
+
+                try (PreparedStatement stmt = conn.prepareStatement(updateOverdraftSql)) {
+                    stmt.setDouble(1, overdraftPart);
+                    stmt.setString(2, account.getAccountNumber());
+                    stmt.executeUpdate();
+                }
+            }
+
+            conn.commit();
+
+            // 3. Update in-memory object
+            account.setBalance(balance - amount);
+
+            if (amount > balance) {
+                double overdraftPart = amount - balance;
+                account.getOverdraft().setOverdraftBalance(overdraftUsed + overdraftPart);
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error during withdrawal: " + e.getMessage(), e);
+        }
+        return true;
+    }
+
+    private static boolean insertOverdraft(String accountNumber) {
+        String sql = """
+        INSERT INTO Overdraft (account_number, overdraft_balance, max_overdraft, overdraft_start)
+        VALUES (?, 0, 100, ?);
+        """;
+
+        try (Connection conn = connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, accountNumber);
+            stmt.setString(2, LocalDate.now().toString());
+
+            return stmt.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error inserting overdraft row: " + e.getMessage(), e);
+        }
     }
 
     /// TIME TO WORK ON ACCOUNT CREATION, GENERATIONS WITHDRAW AND DEPOST
@@ -489,17 +653,9 @@ private static Connection connect() throws Exception {
     /// THE ACCOUNTS SHOULD BE GENERATED FIRST WITHIN 3 METHODS ONE FOR EACH ACCOUNT TYPE AN OVERLOADED METHOD WOULD WORK NICELY
     ///  WITHDRAW AND DEPOSI CAN COME AFTER ACCOUNT CREATION
 
-    public boolean checkCustomerID(String id){
-        String query="SELECT COUNT(*) FROM Customer WHERE customer_ID=?;";
-        try (Connection conn = connect();
-             PreparedStatement stmt =conn.prepareStatement(query)){
-            stmt.setString(1,id);
-            int count=stmt.executeUpdate();
-            return count<1;
-        }catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-}
+    public boolean checkCustomerID(String id) {
+        return false;
+    }
     public boolean checkTellerID(String id) {
         String query = "SELECT COUNT(*) FROM Teller WHERE teller_id=?;";
         try (Connection conn = connect();
@@ -511,4 +667,31 @@ private static Connection connect() throws Exception {
             throw new RuntimeException(e);
         }
     }
+    public static void postLogToDB(Logger log) {
+        String query = """
+        INSERT INTO LOGS (log_type, message, source, teller_ID, customer_ID, account_number) VALUES (?, ?, ?, ?, ?, ?)
+        """;
+        try (Connection conn = connect();
+            PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, log.getType().name());
+            stmt.setString(2, log.getMessage());
+            stmt.setString(3, log.getSource());
+            stmt.setInt(4, log.getTellerId());
+            if (log.getCustomerId() != null) {
+                stmt.setInt(5, log.getCustomerId());
+            } else {
+                stmt.setNull(5, Types.INTEGER);
+            }
+            if (log.getAccountNumber() != null) {
+                stmt.setString(6, log.getAccountNumber());
+            } else  {
+                stmt.setNull(6, Types.VARCHAR);
+            }
+            stmt.executeUpdate();
+        } catch (Exception e) {
+            IO.println("Error while posting log to DB: " + e.getMessage());
+        }
+    }
 }
+
+

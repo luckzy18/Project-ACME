@@ -3,6 +3,10 @@ package org.example.model;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import org.example.Database.DBinterface;
+import org.example.UI.TellerUI;
+import org.example.logger.LogType;
+import org.example.logger.Logger;
 import org.example.model.Account.Account;
 
 public class Transaction {
@@ -42,10 +46,19 @@ public class Transaction {
     }
 
     //Core method
-    public boolean performTransaction(Account account) {
+    public boolean performTransaction(Account account, int tellerId) {
         if (!account.getAccountNumber().equals(this.accountNumber)) {
             this.status = TransactionStatus.FAILED;
             this.updates = "Account number doesn't match.";
+            DBinterface.postLogToDB(new Logger(
+                    LogType.ERROR,
+                    this.transactionID + " " + "Transaction Failed: Account Mismatch" + "\nReason: "
+                            + this.updates,
+                    "performTransaction",
+                    tellerId,
+                    account.getCustomerID(),
+                    this.accountNumber
+            ));
             return false;
         }
         try {
@@ -67,21 +80,44 @@ public class Transaction {
             this.balanceAfter = account.getBalance();
             this.status = TransactionStatus.COMPLETE;
             this.updates = "Transaction successful";
+            DBinterface.postLogToDB(new Logger(
+                    LogType.INFO,
+                    this.transactionID + " " + this.updates + " --[" + type + "]-- " + "£" + amount,
+                    "performTransaction - switchStatement",
+                    tellerId,
+                    account.getCustomerID(),
+                    this.accountNumber
+            ));
             return true;
 
         } catch (Exception e) {
             this.status = TransactionStatus.FAILED;
             this.updates = "Error! Transaction failed.";
-            e.printStackTrace();//Changed to be consistent for now, will circle back to remove later.
+            DBinterface.postLogToDB(new Logger(
+                    LogType.ERROR,
+                    this.transactionID + " " + this.status,
+                    "performTransaction - switchStatement (e)",
+                    tellerId,
+                    account.getCustomerID(),
+                    this.accountNumber
+            ));
             return false;
         }
     }
 
     //Transfer method
-    public boolean performTransfer(Account senderAccount, Account recipientAccount) {
+    public boolean performTransfer(Account senderAccount, Account recipientAccount, int tellerId) {
         if (senderAccount == null || recipientAccount == null) {//I don't particulary like the sender/recipient names so I'm open to suggestions.
             this.status = TransactionStatus.FAILED;
             this.updates = "Transfer invalid. Check accounts are correct.";
+            DBinterface.postLogToDB(new Logger(
+                    LogType.ERROR,
+                    this.transactionID + " Transfer Failed: Account/s Mismatch" + "\nReason: " + this.updates,
+                    "performTransaction",
+                    tellerId,
+                    null,
+                    null
+            ));
             return false;
         }
         try {
@@ -92,12 +128,28 @@ public class Transaction {
             this.linkedAccountNumber = recipientAccount.getAccountNumber();
             this.status = TransactionStatus.COMPLETE;
             this.updates = "Transfer successful.";
+            DBinterface.postLogToDB(new Logger(
+                    LogType.INFO,
+                    this.transactionID + " " + this.updates + " " + this.status + "Sent to: " +
+                            recipientAccount.getAccountNumber() + " £" + amount,
+                    "performTransaction",
+                    tellerId,
+                    senderAccount.getCustomerID(),
+                    senderAccount.getAccountNumber()
+            ));
             return true;
 
         } catch (Exception e) {
             this.status = TransactionStatus.FAILED;
             this.updates = "Error! Transfer failed.";
-            e.printStackTrace();
+            DBinterface.postLogToDB(new Logger(
+                    LogType.ERROR,
+                    this.transactionID + " " + this.updates + " " + this.status,
+                    "performTransfer - switchStatement (e)",
+                    tellerId,
+                    senderAccount.getCustomerID(),
+                    senderAccount.getAccountNumber()
+            ));
             return false;
         }
     }

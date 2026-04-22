@@ -1,5 +1,8 @@
 package org.example.Database;
 
+import org.example.logger.LogType;
+import org.example.logger.Logger;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -40,7 +43,7 @@ public class CreateDB {
                     balance         REAL NOT NULL,
                     is_active TEXT NOT NULL,
                     account_type TEXT NOT NULL,
-                    FOREIGN KEY (customer_ID) REFERENCES CUSTOMER(customer_ID)
+                    FOREIGN KEY (customer_ID) REFERENCES Customer(customer_ID)
                 );
                 """;
         String createOverdraft = """
@@ -81,6 +84,24 @@ public class CreateDB {
                  )
                """;
 
+        String createLoggingTable= """
+                CREATE TABLE IF NOT EXISTS LOGS (
+                log_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                log_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                log_type TEXT NOT NULL,
+                message TEXT NOT NULL,
+                source TEXT,
+                
+                teller_ID INTEGER,
+                customer_ID INTEGER,
+                account_number TEXT,
+                
+                FOREIGN KEY (teller_ID) REFERENCES Teller(teller_ID),
+                FOREIGN KEY (customer_ID) REFERENCES Customer(customer_ID),
+                FOREIGN KEY (account_number) REFERENCES Account(account_number)
+                );
+                """;
+
 
         try (Connection conn = connect();
              Statement stmt = conn.createStatement()) {
@@ -98,26 +119,52 @@ public class CreateDB {
             stmt.execute(createBusinessAccount);
             IO.println("business account created");
             stmt.execute(createOverdraft);
+            IO.println("overdraft account created");
+            stmt.execute(createLoggingTable);
+            IO.println("logging table created");
             System.out.println("Tables created successfully.");
             initialiseMainTeller();
+            DBinterface.postLogToDB(new Logger(
+                    LogType.INFO,
+                    "I created myself",
+                    "DB",
+                    0,
+                    null,
+                    null
+            ));
         } catch (Exception e) {
             System.out.println("Error creating tables: " + e.getMessage());
             e.printStackTrace();
         }
     }
     private  static void initialiseMainTeller(){
-        String insertMainTeller="INSERT INTO Teller(teller_name,teller_Password,teller_role)" +
+        String insertMainTeller="INSERT INTO Teller(teller_name,teller_Password,teller_role) " +
                 "VALUES(?,?,?)";
         try (Connection conn = connect();
              PreparedStatement stmt = conn.prepareStatement(insertMainTeller)){
 
-             stmt.setString(1,"ADMIN");
+            stmt.setString(1,"ADMIN");
             stmt.setString(2,"1234");
             stmt.setString(3,"ADMIN");
             stmt.executeUpdate();
             IO.println("Main teller added TO01 Admin");
+            DBinterface.postLogToDB(new Logger(
+                    LogType.INFO,
+                    "I created a Master Teller",
+                    "DB",
+                    1,
+                    null,
+                    null
+            ));
         }catch(Exception e){
-            e.printStackTrace();
+            DBinterface.postLogToDB(new Logger(
+                    LogType.ERROR,
+                    "I cant connect to myself to create a Teller",
+                    "DB",
+                    0,
+                    null,
+                    null
+            ));
         }
 
     }

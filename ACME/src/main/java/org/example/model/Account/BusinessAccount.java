@@ -23,11 +23,11 @@ public class BusinessAccount extends Account {
     }
 
     public boolean hasOverdraft() {
-        return overdraft;
+        return overdraft.isInOverdraft();
     }
 
     public double getOverdraftAmount() {
-        return overdraftAmount;
+        return overdraft.getOverdraftBalance();
     }
 
     public boolean hasLoanRequest() {
@@ -46,7 +46,7 @@ public class BusinessAccount extends Account {
     @Override
     public String toString() {
         String overdraftInfo = (overdraft != null)
-                ? String.format("Yes (£%.2f)", overdraft.GetMaxOverdraft())
+                ? String.format("Yes (£%.2f)", overdraft.getMaxOverdraft())
                 : "No";
         return super.toString() + String.format(
                 """
