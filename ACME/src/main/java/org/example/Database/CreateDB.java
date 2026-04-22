@@ -80,6 +80,62 @@ public class CreateDB {
                 FOREIGN KEY (account_number) REFERENCES Account(account_number)
                  )
                """;
+        String createTransfer = """
+        CREATE TABLE IF NOT EXISTS Transfer (
+            transfer_id       INTEGER PRIMARY KEY AUTOINCREMENT,
+            from_account      TEXT NOT NULL,
+            to_account        TEXT NOT NULL,
+            amount            REAL NOT NULL,
+            transfer_date     TEXT NOT NULL,
+            reference         TEXT,
+            status            TEXT NOT NULL DEFAULT 'COMPLETED',
+            FOREIGN KEY (from_account) REFERENCES Account(account_number),
+            FOREIGN KEY (to_account) REFERENCES Account(account_number)
+        );
+        """;
+
+        String createDirectDebit = """
+        CREATE TABLE IF NOT EXISTS DirectDebit (
+            dd_id             INTEGER PRIMARY KEY AUTOINCREMENT,
+            account_number    TEXT NOT NULL,
+            merchant_name     TEXT NOT NULL,
+            amount            REAL NOT NULL,
+            frequency         TEXT NOT NULL,
+            next_payment_date TEXT NOT NULL,
+            active            INTEGER NOT NULL DEFAULT 1,
+            FOREIGN KEY (account_number) REFERENCES Account(account_number)
+        );
+        """;
+
+        String createStandingOrder = """
+        CREATE TABLE IF NOT EXISTS StandingOrder (
+            so_id             INTEGER PRIMARY KEY AUTOINCREMENT,
+            from_account      TEXT NOT NULL,
+            to_account        TEXT NOT NULL,
+            amount            REAL NOT NULL,
+            frequency         TEXT NOT NULL,
+            next_payment_date TEXT NOT NULL,
+            active            INTEGER NOT NULL DEFAULT 1,
+            reference         TEXT,
+            FOREIGN KEY (from_account) REFERENCES Account(account_number),
+            FOREIGN KEY (to_account) REFERENCES Account(account_number)
+        );
+        """;
+
+        String createPaymentHistory = """
+        CREATE TABLE IF NOT EXISTS PaymentHistory (
+            payment_id        INTEGER PRIMARY KEY AUTOINCREMENT,
+            account_number    TEXT NOT NULL,
+            type              TEXT NOT NULL,   -- TRANSFER, DIRECT_DEBIT, STANDING_ORDER
+            amount            REAL NOT NULL,
+            date              TEXT NOT NULL,
+            reference         TEXT,
+            FOREIGN KEY (account_number) REFERENCES Account(account_number)
+        );
+        """;
+
+
+
 
 
         try (Connection conn = connect();
@@ -87,18 +143,37 @@ public class CreateDB {
 
             stmt.execute(createCustomers);
             System.out.println("Customers created");
+
             stmt.execute(createTeller);
             System.out.println("tellers created");
+
             stmt.execute(createAccount);
             System.out.println("account created");
+
             stmt.execute(createPersonalAccount);
             IO.println("personal account created");
+
             stmt.execute(createISAAccount);
             IO.println("ISA account created");
+
             stmt.execute(createBusinessAccount);
             IO.println("business account created");
+
             stmt.execute(createOverdraft);
             System.out.println("Tables created successfully.");
+
+            stmt.execute(createTransfer);
+            IO.println("transfer table created");
+
+            stmt.execute(createDirectDebit);
+            IO.println("direct debit table created");
+
+            stmt.execute(createStandingOrder);
+            IO.println("standing order table created");
+
+            stmt.execute(createPaymentHistory);
+            IO.println("payment history table created");
+
             initialiseMainTeller();
         } catch (Exception e) {
             System.out.println("Error creating tables: " + e.getMessage());
